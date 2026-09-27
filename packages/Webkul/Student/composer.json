@@ -1,0 +1,28 @@
+{
+    "name": "webkul/student",
+    "description": "Student authentication via university API for Krayin CRM",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Webkul"
+        }
+    ],
+    "require": {
+        "php": "^8.3",
+        "guzzlehttp/guzzle": "^7.8",
+        "laravel/framework": "^12.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Webkul\\Student\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Webkul\\Student\\Providers\\StudentServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev"
+}

@@ -1,0 +1,77 @@
+{
+  "node_modules/@fortawesome/fontawesome-free/webfonts/fa-brands-400.woff2": {
+    "file": "assets/fa-brands-400-Bs6tcqqs.woff2",
+    "src": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-brands-400.woff2"
+  },
+  "node_modules/@fortawesome/fontawesome-free/webfonts/fa-regular-400.woff2": {
+    "file": "assets/fa-regular-400-DRN8N0d1.woff2",
+    "src": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-regular-400.woff2"
+  },
+  "node_modules/@fortawesome/fontawesome-free/webfonts/fa-solid-900.woff2": {
+    "file": "assets/fa-solid-900-IAB4Droh.woff2",
+    "src": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-solid-900.woff2"
+  },
+  "node_modules/@fortawesome/fontawesome-free/webfonts/fa-v4compatibility.woff2": {
+    "file": "assets/fa-v4compatibility-CErXDOsT.woff2",
+    "src": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-v4compatibility.woff2"
+  },
+  "src/Resources/assets/css/app.css": {
+    "file": "assets/app-BSBfGUD3.js",
+    "name": "app",
+    "src": "src/Resources/assets/css/app.css",
+    "isEntry": true,
+    "css": [
+      "assets/app-CC4N6Z7N.css"
+    ],
+    "assets": [
+      "assets/fa-brands-400-Bs6tcqqs.woff2",
+      "assets/fa-regular-400-DRN8N0d1.woff2",
+      "assets/fa-solid-900-IAB4Droh.woff2",
+      "assets/fa-v4compatibility-CErXDOsT.woff2",
+      "assets/Cairo-Light-DijhTkuQ.ttf",
+      "assets/Cairo-Regular-CvRCENXA.ttf",
+      "assets/Cairo-Medium-BVfnydw0.ttf",
+      "assets/Cairo-SemiBold-WHNjihNv.ttf",
+      "assets/Cairo-Bold-CRUa7UyS.ttf",
+      "assets/Cairo-ExtraBold-BOrJWdUw.ttf",
+      "assets/Cairo-Black-BBBecWCb.ttf"
+    ]
+  },
+  "src/Resources/assets/fonts/Cairo-Black.ttf": {
+    "file": "assets/Cairo-Black-BBBecWCb.ttf",
+    "src": "src/Resources/assets/fonts/Cairo-Black.ttf"
+  },
+  "src/Resources/assets/fonts/Cairo-Bold.ttf": {
+    "file": "assets/Cairo-Bold-CRUa7UyS.ttf",
+    "src": "src/Resources/assets/fonts/Cairo-Bold.ttf"
+  },
+  "src/Resources/assets/fonts/Cairo-ExtraBold.ttf": {
+    "file": "assets/Cairo-ExtraBold-BOrJWdUw.ttf",
+    "src": "src/Resources/assets/fonts/Cairo-ExtraBold.ttf"
+  },
+  "src/Resources/assets/fonts/Cairo-Light.ttf": {
+    "file": "assets/Cairo-Light-DijhTkuQ.ttf",
+    "src": "src/Resources/assets/fonts/Cairo-Light.ttf"
+  },
+  "src/Resources/assets/fonts/Cairo-Medium.ttf": {
+    "file": "assets/Cairo-Medium-BVfnydw0.ttf",
+    "src": "src/Resources/assets/fonts/Cairo-Medium.ttf"
+  },
+  "src/Resources/assets/fonts/Cairo-Regular.ttf": {
+    "file": "assets/Cairo-Regular-CvRCENXA.ttf",
+    "src": "src/Resources/assets/fonts/Cairo-Regular.ttf"
+  },
+  "src/Resources/assets/fonts/Cairo-SemiBold.ttf": {
+    "file": "assets/Cairo-SemiBold-WHNjihNv.ttf",
+    "src": "src/Resources/assets/fonts/Cairo-SemiBold.ttf"
+  },
+  "src/Resources/assets/js/app.js": {
+    "file": "assets/app-DFB_T7TI.js",
+    "name": "app",
+    "src": "src/Resources/assets/js/app.js",
+    "isEntry": true,
+    "imports": [
+      "src/Resources/assets/css/app.css"
+    ]
+  }
+}

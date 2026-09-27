@@ -1,0 +1,25 @@
+{
+    "name": "webkul/event",
+    "description": "Event module for Krayin CRM",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Webkul",
+            "email": "example@webkul.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Webkul\\Event\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Webkul\\Event\\Providers\\EventServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev"
+}

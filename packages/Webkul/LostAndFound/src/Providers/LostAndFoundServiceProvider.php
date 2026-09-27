@@ -1,0 +1,40 @@
+<?php
+
+namespace Webkul\LostAndFound\Providers;
+
+use Illuminate\Support\ServiceProvider;
+
+class LostAndFoundServiceProvider extends ServiceProvider
+{
+    /**
+     * Register services.
+     */
+    public function register(): void
+    {
+        $this->registerConfig();
+    }
+
+    /**
+     * Bootstrap services.
+     */
+    public function boot(): void
+    {
+        $this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
+
+        $this->loadTranslationsFrom(__DIR__.'/../Resources/lang', 'lost_found');
+
+        $this->loadRoutesFrom(__DIR__.'/../Routes/student-routes.php');
+        $this->loadRoutesFrom(__DIR__.'/../Routes/employee-routes.php');
+    }
+
+    /**
+     * Register package config.
+     */
+    protected function registerConfig(): void
+    {
+        $this->mergeConfigFrom(
+            __DIR__.'/../Config/lost_found.php',
+            'lost_found',
+        );
+    }
+}

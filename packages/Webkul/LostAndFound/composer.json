@@ -1,0 +1,25 @@
+{
+    "name": "webkul/lost-and-found",
+    "description": "Lost and Found domain module for CampusHub",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Webkul",
+            "email": "example@webkul.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Webkul\\LostAndFound\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Webkul\\LostAndFound\\Providers\\LostAndFoundServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev"
+}

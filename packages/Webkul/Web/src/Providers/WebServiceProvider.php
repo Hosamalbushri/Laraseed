@@ -4,12 +4,14 @@ namespace Webkul\Web\Providers;
 
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
+use Webkul\Theme\Contracts\ThemeResolverContract;
 use Webkul\Web\Context\WebContext;
 use Webkul\Web\Contracts\NavigationRegistryContract;
 use Webkul\Web\Contracts\SectionRegistryContract;
 use Webkul\Web\Contracts\SeoMetadataContract;
 use Webkul\Web\Contracts\WebContextContract;
 use Webkul\Web\Http\Middleware\ResolveWebLocale;
+use Webkul\Web\Navigation\NavigationLabelResolver;
 use Webkul\Web\Navigation\NavigationRegistry;
 use Webkul\Web\Sections\SectionRegistry;
 use Webkul\Web\Seo\SeoService;
@@ -23,6 +25,7 @@ class WebServiceProvider extends ServiceProvider
     {
         $this->app->singleton(NavigationRegistryContract::class, NavigationRegistry::class);
         $this->app->singleton(NavigationRegistry::class);
+        $this->app->bind(NavigationLabelResolver::class);
 
         $this->app->singleton(SectionRegistryContract::class, SectionRegistry::class);
         $this->app->singleton(SectionRegistry::class);
@@ -30,11 +33,11 @@ class WebServiceProvider extends ServiceProvider
         $this->app->singleton(SeoMetadataContract::class, SeoService::class);
         $this->app->singleton(SeoService::class);
 
-        $this->app->scoped(WebContextContract::class, function () {
+        $this->app->scoped(WebContextContract::class, function ($app) {
             return new WebContext(
                 locale: app()->getLocale(),
                 direction: in_array(app()->getLocale(), ['ar', 'fa', 'he'], true) ? 'rtl' : 'ltr',
-                activeTheme: config('themes.active', 'default'),
+                activeTheme: $app->make(ThemeResolverContract::class)->resolveActiveTheme()->id,
             );
         });
     }

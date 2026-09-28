@@ -16,7 +16,7 @@ class NavigationItem
 
     public function __construct(
         public readonly string $id,
-        public readonly string $title,
+        public readonly string|NavigationLabel $title,
         public readonly string $url,
         public readonly string $location = 'header',
         public readonly int $order = 100,
@@ -48,7 +48,9 @@ class NavigationItem
     {
         return [
             'id' => $this->id,
-            'title' => $this->title,
+            'title' => $this->title instanceof NavigationLabel
+                ? $this->title->toArray()
+                : $this->title,
             'url' => $this->url,
             'location' => $this->location,
             'order' => $this->order,

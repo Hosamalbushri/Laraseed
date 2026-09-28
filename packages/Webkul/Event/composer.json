@@ -9,7 +9,8 @@
         }
     ],
     "require": {
-        "webkul/student": "dev-main"
+        "webkul/student": "dev-main",
+        "webkul/web": "dev-main"
     },
     "autoload": {
         "psr-4": {

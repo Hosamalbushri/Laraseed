@@ -2,12 +2,17 @@
 
 namespace Webkul\Event\Repositories;
 
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Webkul\Core\Eloquent\Repository;
 use Webkul\Event\Contracts\Event;
 
 class EventRepository extends Repository
 {
+    public const DEFAULT_PUBLIC_PAGE_SIZE = 12;
+
+    public const MAX_PUBLIC_PAGE_SIZE = 48;
+
     /**
      * Specify model class name.
      *
@@ -158,6 +163,51 @@ class EventRepository extends Repository
             ->get()
             ->filter(fn ($event): bool => $event->status && $event->isCurrentlyAvailable())
             ->values();
+    }
+
+    /**
+     * Return a bounded page of Events allowed by the domain's public visibility policy.
+     */
+    public function paginatePublic(): LengthAwarePaginator
+    {
+        $configuredPageSize = (int) core()->getConfigData('general.store.events_page.per_page');
+        $pageSize = min(
+            self::MAX_PUBLIC_PAGE_SIZE,
+            max(1, $configuredPageSize ?: self::DEFAULT_PUBLIC_PAGE_SIZE),
+        );
+
+        return $this->getModel()
+            ->newQuery()
+            ->published()
+            ->select([
+                'id',
+                'title',
+                'event_date',
+                'event_end_date',
+                'organizer',
+                'available_seats',
+                'availability_use_seats',
+                'availability_use_end_date',
+                'image',
+                'description',
+            ])
+            ->orderByRaw('event_date IS NULL')
+            ->orderBy('event_date')
+            ->orderBy('id')
+            ->paginate($pageSize)
+            ->withQueryString();
+    }
+
+    /**
+     * Find one publicly visible Event without disclosing non-public records.
+     */
+    public function findPublicOrFail(int $id): mixed
+    {
+        return $this->getModel()
+            ->newQuery()
+            ->published()
+            ->with('images:id,event_id,path,position')
+            ->findOrFail($id);
     }
 
     public function subscribedByStudent(int $studentId): Collection

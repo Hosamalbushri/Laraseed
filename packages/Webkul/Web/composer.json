@@ -11,7 +11,8 @@
     ],
     "require": {
         "php": "^8.2",
-        "illuminate/support": "^11.0|^12.0"
+        "illuminate/support": "^11.0|^12.0",
+        "webkul/theme": "dev-main"
     },
     "autoload": {
         "psr-4": {

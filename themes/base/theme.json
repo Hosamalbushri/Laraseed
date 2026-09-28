@@ -1,0 +1,8 @@
+{
+    "id": "base",
+    "name": "Base",
+    "parent": null,
+    "views_path": "views",
+    "assets_path": "assets",
+    "version": "1.0.0"
+}

@@ -3,7 +3,7 @@
 namespace Webkul\Web\Contracts;
 
 use Illuminate\Support\Collection;
-use Webkul\Web\Navigation\NavigationItem;
+use Webkul\Web\Navigation\NavigationLabel;
 
 interface NavigationRegistryContract
 {
@@ -12,7 +12,7 @@ interface NavigationRegistryContract
      *
      * @param array{
      *     id: string,
-     *     title: string,
+     *     title: string|NavigationLabel,
      *     url: string,
      *     location?: string,
      *     order?: int,

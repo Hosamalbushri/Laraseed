@@ -12,6 +12,7 @@ Webkul\Core
 Webkul\Admin infrastructure
 Webkul\User authentication and authorization infrastructure
 Webkul\DataGrid
+Webkul\Web public presentation infrastructure (Composer package: webkul/web)
 
 OPTIONAL_DEPENDENCIES:
 Webkul\Student (Composer package: webkul/student)
@@ -55,6 +56,7 @@ Webkul\Student\Models\Student deleting lifecycle callback
 
 UI_EXTENSION_POINTS:
 Admin view render events for dashboard, Student subscriptions, Mega Search, and Quick Creation
+Web NavigationRegistryContract contributions for header and mobile navigation
 
 QUERY_CONTRIBUTIONS:
 DashboardStatsRegistry Event metrics
@@ -63,6 +65,7 @@ MegaSearch Event registration
 
 ROUTES:
 src/Routes/admin-routes.php
+src/Routes/web-routes.php
 src/Routes/breadcrumbs.php
 
 ACL:
@@ -84,7 +87,17 @@ src/DataGrids/Admin
 src/Resources/views/admin
 
 FRONTEND_PRESENTATION:
-Provided by the dependent Webkul\Shop integration; remediation is deferred to the Shop architecture wave.
+Event-owned public discovery and detail presentation:
+src/Http/Controllers/Web/EventController.php
+src/Resources/views/web/index.blade.php
+src/Resources/views/web/show.blade.php
+src/Resources/lang/*/web.php
+
+PUBLIC_WEB_READ_POLICY:
+EventRepository::paginatePublic() and EventRepository::findPublicOrFail() apply Event::scopePublished(). The listing uses bounded pagination from general.store.events_page.per_page (default 12, clamped to 1..48). Detail lookup uses the numeric events.id identifier and returns 404 for missing or non-public records.
+
+PUBLIC_WEB_INTEGRATION:
+EventServiceProvider loads Event-owned public routes and contributes the request-independent event.events NavigationLabel definition to generic Web header/mobile registries. Event declares webkul/web; Web, Theme, and Base Theme contain no Event-specific knowledge.
 
 DATA_INSTALL/UNINSTALL POLICY:
 Install Event migrations after Student because event_student references students. Uninstall or retain Event data only through an explicitly approved deployment procedure; historical migrations are not rewritten.
@@ -93,7 +106,7 @@ FOUNDATION_SOURCE_EDITS_REQUIRED_TO_REMOVE:
 0
 ```
 
-The public surface is the listed model contracts and `EventSubscriptionService`. Repositories, controllers, FormRequests, listeners, views, configuration files, migrations, and `EventWriteService` are package internals. Shop's current repository imports are legacy consumers to be replaced by a deliberate Event query API during the Shop architecture wave.
+The cross-package public surface is the listed model contracts and `EventSubscriptionService`. Repositories, controllers, FormRequests, listeners, views, configuration files, migrations, and `EventWriteService` are package internals. `EventRepository` additionally forms Event's internal application/read boundary for its own public Web controller. Shop's current repository imports are legacy consumers to be replaced by a deliberate Event query API during the Shop architecture wave.
 
 ## Primary image projection contract
 

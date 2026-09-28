@@ -33,7 +33,7 @@ class NavigationRegistry implements NavigationRegistryContract
     public function register(array $item): static
     {
         $id = (string) ($item['id'] ?? '');
-        $title = (string) ($item['title'] ?? '');
+        $title = $item['title'] ?? '';
         $url = (string) ($item['url'] ?? '');
         $location = (string) ($item['location'] ?? 'header');
 
@@ -41,7 +41,11 @@ class NavigationRegistry implements NavigationRegistryContract
             throw new InvalidArgumentException('Navigation item ID is required.');
         }
 
-        if (empty($title)) {
+        if (! is_string($title) && ! $title instanceof NavigationLabel) {
+            throw new InvalidArgumentException("Navigation item title must be a string or NavigationLabel for [{$id}].");
+        }
+
+        if (is_string($title) && empty($title)) {
             throw new InvalidArgumentException("Navigation item title is required for [{$id}].");
         }
 

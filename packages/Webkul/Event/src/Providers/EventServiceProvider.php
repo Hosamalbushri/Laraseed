@@ -15,6 +15,8 @@ use Webkul\Event\Services\EventDashboardService;
 use Webkul\Event\Services\EventSubscriptionService;
 use Webkul\Event\Services\EventWriteService;
 use Webkul\Student\Models\Student;
+use Webkul\Web\Contracts\NavigationRegistryContract;
+use Webkul\Web\Navigation\NavigationLabel;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -31,11 +33,14 @@ class EventServiceProvider extends ServiceProvider
 
         $this->loadRoutesFrom(__DIR__.'/../Routes/admin-routes.php');
 
+        $this->loadRoutesFrom(__DIR__.'/../Routes/web-routes.php');
+
         require __DIR__.'/../Routes/breadcrumbs.php';
 
         $this->registerDashboardContributions();
         $this->registerViewContributions();
         $this->registerStudentExtensions();
+        $this->registerWebNavigation();
 
         app(MegaSearch::class)->register(
             'events',
@@ -176,5 +181,26 @@ class EventServiceProvider extends ServiceProvider
             app(EventSubscriptionService::class)
                 ->removeStudentSubscriptions((int) $student->getKey());
         });
+    }
+
+    protected function registerWebNavigation(): void
+    {
+        $navigation = app(NavigationRegistryContract::class);
+        $definition = [
+            'id' => 'event.events',
+            'title' => NavigationLabel::translation('event::web.navigation.events'),
+            'url' => '/events',
+            'order' => 20,
+        ];
+
+        $navigation->register([
+            ...$definition,
+            'location' => 'header',
+        ]);
+
+        $navigation->register([
+            ...$definition,
+            'location' => 'mobile',
+        ]);
     }
 }

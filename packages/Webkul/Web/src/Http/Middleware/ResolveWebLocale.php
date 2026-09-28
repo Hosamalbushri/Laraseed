@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Webkul\Core\Repositories\LocaleRepository;
 use Webkul\Core\Services\ContentLocaleService;
+use Webkul\Theme\Contracts\ThemeResolverContract;
+use Webkul\Theme\View\ThemeViewFinder;
 use Webkul\Web\Context\WebContext;
 use Webkul\Web\Contracts\WebContextContract;
 
@@ -15,12 +17,13 @@ class ResolveWebLocale
     public function __construct(
         protected ContentLocaleService $contentLocaleService,
         protected LocaleRepository $localeRepository,
+        protected ThemeResolverContract $themeResolver,
     ) {}
 
     /**
      * Handle an incoming request.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  Closure(Request): (Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
@@ -46,10 +49,17 @@ class ResolveWebLocale
         $directionEnum = $this->localeRepository->directionFor($effectiveLocale);
         $direction = $directionEnum ? $directionEnum->value : 'ltr';
 
+        $activeTheme = $this->themeResolver->resolveActiveTheme();
+        $viewFinder = view()->getFinder();
+
+        if ($viewFinder instanceof ThemeViewFinder) {
+            $viewFinder->setActiveThemeChain($this->themeResolver->resolveActiveInheritanceChain());
+        }
+
         $webContext = new WebContext(
             locale: $effectiveLocale,
             direction: $direction,
-            activeTheme: config('themes.active', 'default'),
+            activeTheme: $activeTheme->id,
             canonicalUrl: $request->url(),
         );
 

@@ -4,12 +4,12 @@ return [
     /*
      * Default / Active Theme ID.
      */
-    'active' => env('APP_THEME', 'default'),
+    'active' => env('APP_THEME', 'base'),
 
     /*
      * Fallback Theme ID when a view is missing in the active theme.
      */
-    'fallback' => 'default',
+    'fallback' => 'base',
 
     /*
      * Themes scan paths.

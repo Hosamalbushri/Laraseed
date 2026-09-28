@@ -81,6 +81,7 @@ it('proves Theme registers 0 HTTP routes', function () {
     $themeRoutes = collect(Route::getRoutes()->getRoutes())
         ->filter(function ($route) {
             $action = $route->getActionName();
+
             return str_contains($action, 'Webkul\\Theme');
         });
 
@@ -94,7 +95,7 @@ it('integrates resolved theme into WebContext on web requests', function () {
 
     /** @var WebContextContract $webContext */
     $webContext = app(WebContextContract::class);
-    expect($webContext->activeTheme())->toBe('default');
+    expect($webContext->activeTheme())->toBe('base');
 });
 
 it('ensures Admin requests do not resolve or require Web themes', function () {

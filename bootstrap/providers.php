@@ -11,6 +11,7 @@ use Webkul\Installer\Providers\InstallerServiceProvider;
 use Webkul\LostAndFound\Providers\LostAndFoundServiceProvider;
 use Webkul\Student\Providers\StudentServiceProvider;
 use Webkul\User\Providers\UserServiceProvider;
+use Webkul\Web\Providers\WebServiceProvider;
 
 return [
     /*
@@ -35,4 +36,5 @@ return [
     EventServiceProvider::class,
     StudentServiceProvider::class,
     LostAndFoundServiceProvider::class,
+    WebServiceProvider::class,
 ];

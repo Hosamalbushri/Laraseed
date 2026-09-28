@@ -1,0 +1,53 @@
+# 10. Admin / Web Presentation Boundary and Infrastructure Rules
+
+## Status
+Mandatory Foundation Architectural Rule.
+
+---
+
+## 1. Fundamental Principle: Presentation Separation
+`Admin` and `Web` are distinct, independent presentation layers.
+- **`Webkul\Admin`**: Admin Presentation Infrastructure (for staff and privileged users).
+- **`Webkul\Web`**: Web Presentation Infrastructure (for public portal visitors, students, and guests).
+- **`Webkul\Theme`**: Visual rendering and theme engine (consumed by `Web`).
+- **Business Packages (`Student`, `Event`, `LostAndFound`)**: Owners of their respective domain-specific presentation on both Admin and Web surfaces.
+
+```text
+ADMIN ≠ WEB
+```
+
+---
+
+## 2. Dependency Direction Rules
+
+1. **Foundation Presentation to Domain Separation**:
+   - `Webkul\Admin` MUST NOT depend on `Webkul\Student`, `Webkul\Event`, `Webkul\LostAndFound`, or `Webkul\Web`.
+   - `Webkul\Web` MUST NOT depend on `Webkul\Student`, `Webkul\Event`, `Webkul\LostAndFound`, or `Webkul\Admin`.
+2. **Domain to Presentation Direction**:
+   - Domain packages register their presentation contributions via generic contracts (`NavigationRegistryContract`, `SectionRegistryContract`, `ViewRenderEventManager`, DataGrids, CoreConfig, Menu, ACL).
+3. **Theme Dependency**:
+   - Themes depend on `Webkul\Web` contracts and view structures. `Webkul\Web` NEVER depends on a specific Theme package.
+4. **Ecommerce Prohibition**:
+   - Neither `Admin` nor `Web` may contain ecommerce concepts (carts, checkouts, payment gateways, products, orders, customers, shop themes).
+
+---
+
+## 3. Pipeline Separation
+
+| Dimension | Admin Pipeline | Web Pipeline |
+| :--- | :--- | :--- |
+| **Middleware** | `['web', 'admin_locale', 'user', 'bouncer']` | `['web', 'web_context']` |
+| **Locale Authority** | Admin config / employee preference | `ContentLocaleService` + dynamic session / cookie |
+| **View Namespace** | `admin::*` | `web::*` |
+| **Translation Namespace** | `admin::*` | `web::*` |
+| **Authentication Guard** | `user` | Optional / none (public visitor) |
+| **Navigation Registry** | `core()->getAdminMenu()` / `menu.admin` | `NavigationRegistryContract` |
+| **Layout Shell** | `admin::layouts.master` | `web::layouts.master` |
+
+---
+
+## 4. Verification and Enforcement
+All changes must be verified against automated boundary isolation tests ensuring:
+1. Production code in `packages/Webkul/Web` contains 0 imports or references to forbidden packages.
+2. Web routes never execute Admin authentication or ACL middleware.
+3. Translations and views remain strictly namespaced under `web::`.

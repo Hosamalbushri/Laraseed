@@ -4,7 +4,6 @@ namespace Webkul\Student\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Webkul\Event\Models\Event;
 
 class Student extends Authenticatable
 {
@@ -44,18 +43,5 @@ class Student extends Authenticatable
         return [
             'password' => 'hashed',
         ];
-    }
-
-    /**
-     * Published events this student subscribed to via the portal.
-     */
-    public function subscribedEvents()
-    {
-        return $this->belongsToMany(
-            Event::class,
-            'event_student',
-            'student_id',
-            'event_id'
-        )->withTimestamps();
     }
 }

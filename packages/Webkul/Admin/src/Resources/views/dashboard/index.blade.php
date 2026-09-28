@@ -41,9 +41,7 @@
         {!! view_render_event('admin.dashboard.index.content.left.before') !!}
 
         <div class="flex flex-1 flex-col gap-4 max-xl:flex-auto">
-            @include('admin::dashboard.index.events-students-over-all')
-
-            @include('admin::dashboard.index.student-subscriptions-over-time')
+            {!! view_render_event('admin.dashboard.index.content.left') !!}
         </div>
 
         {!! view_render_event('admin.dashboard.index.content.left.after') !!}
@@ -52,9 +50,7 @@
         {!! view_render_event('admin.dashboard.index.content.right.before') !!}
 
         <div class="flex w-[378px] max-w-full flex-col gap-4 max-sm:w-full">
-            @include('admin::dashboard.index.events-status-distribution')
-
-            @include('admin::dashboard.index.top-subscribed-events')
+            {!! view_render_event('admin.dashboard.index.content.right') !!}
         </div>
 
         {!! view_render_event('admin.dashboard.index.content.left.after') !!}

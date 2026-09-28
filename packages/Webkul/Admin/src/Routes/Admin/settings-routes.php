@@ -6,11 +6,20 @@ use Webkul\Admin\Http\Controllers\Settings\RoleController;
 use Webkul\Admin\Http\Controllers\Settings\SettingController;
 use Webkul\Admin\Http\Controllers\Settings\ShopThemeCustomizationController;
 use Webkul\Admin\Http\Controllers\Settings\UserController;
+use Webkul\Admin\Http\Controllers\Settings\WebsiteLanguageController;
 
 /**
  * Settings routes (minimal: groups, roles, users, shop theme + settings search).
  */
 Route::prefix('settings')->group(function () {
+    Route::controller(WebsiteLanguageController::class)->prefix('website-languages')->group(function () {
+        Route::get('', 'index')->name('admin.settings.website-languages.index');
+        Route::post('', 'store')->name('admin.settings.website-languages.store');
+        Route::put('{id}', 'update')->name('admin.settings.website-languages.update');
+        Route::post('{id}/activate', 'activate')->name('admin.settings.website-languages.activate');
+        Route::post('{id}/deactivate', 'deactivate')->name('admin.settings.website-languages.deactivate');
+        Route::post('{id}/primary', 'primary')->name('admin.settings.website-languages.primary');
+    });
     /**
      * Settings routes.
      */

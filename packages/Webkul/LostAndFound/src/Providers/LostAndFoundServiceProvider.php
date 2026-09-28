@@ -23,6 +23,8 @@ class LostAndFoundServiceProvider extends ServiceProvider
 
         $this->loadTranslationsFrom(__DIR__.'/../Resources/lang', 'lost_found');
 
+        $this->loadViewsFrom(__DIR__.'/../Resources/views', 'lost_found');
+
         $this->loadRoutesFrom(__DIR__.'/../Routes/student-routes.php');
         $this->loadRoutesFrom(__DIR__.'/../Routes/employee-routes.php');
     }
@@ -32,6 +34,11 @@ class LostAndFoundServiceProvider extends ServiceProvider
      */
     protected function registerConfig(): void
     {
+        $this->mergeConfigFrom(
+            __DIR__.'/../Config/acl.php',
+            'acl',
+        );
+
         $this->mergeConfigFrom(
             __DIR__.'/../Config/lost_found.php',
             'lost_found',

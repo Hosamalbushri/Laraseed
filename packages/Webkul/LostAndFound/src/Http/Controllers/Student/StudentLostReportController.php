@@ -24,7 +24,7 @@ class StudentLostReportController extends Controller
 
         if ($request->wantsJson()) {
             return response()->json([
-                'message' => 'Lost report created successfully.',
+                'message' => trans('lost_found::app.student.reports.created_success'),
                 'data' => [
                     'id' => $report->id,
                     'public_reference' => $report->public_reference,
@@ -34,7 +34,7 @@ class StudentLostReportController extends Controller
             ], 201);
         }
 
-        return redirect()->back()->with('success', 'Lost report created successfully.');
+        return redirect()->back()->with('success', trans('lost_found::app.student.reports.created_success'));
     }
 
     public function update(UpdateLostReportRequest $request, int $id): JsonResponse|RedirectResponse
@@ -46,7 +46,7 @@ class StudentLostReportController extends Controller
 
         if ($request->wantsJson()) {
             return response()->json([
-                'message' => 'Lost report updated successfully.',
+                'message' => trans('lost_found::app.student.reports.updated_success'),
                 'data' => [
                     'id' => $updated->id,
                     'title' => $updated->title,
@@ -54,7 +54,7 @@ class StudentLostReportController extends Controller
             ]);
         }
 
-        return redirect()->back()->with('success', 'Lost report updated successfully.');
+        return redirect()->back()->with('success', trans('lost_found::app.student.reports.updated_success'));
     }
 
     public function uploadImage(UploadLostReportImageRequest $request, int $id): JsonResponse|RedirectResponse
@@ -66,7 +66,7 @@ class StudentLostReportController extends Controller
 
         if ($request->wantsJson()) {
             return response()->json([
-                'message' => 'Image uploaded successfully.',
+                'message' => trans('lost_found::app.student.reports.image_uploaded_success'),
                 'data' => [
                     'id' => $image->id,
                     'sort_order' => $image->sort_order,
@@ -74,6 +74,6 @@ class StudentLostReportController extends Controller
             ], 201);
         }
 
-        return redirect()->back()->with('success', 'Image uploaded successfully.');
+        return redirect()->back()->with('success', trans('lost_found::app.student.reports.image_uploaded_success'));
     }
 }

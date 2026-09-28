@@ -5,7 +5,7 @@ use Webkul\LostAndFound\Http\Controllers\Student\StudentClaimController;
 use Webkul\LostAndFound\Http\Controllers\Student\StudentLostReportController;
 
 Route::prefix('student/lost-found')
-    ->middleware(['web', 'auth:student'])
+    ->middleware(['web', 'admin_locale', 'auth:student'])
     ->group(function () {
         Route::post('reports', [StudentLostReportController::class, 'store'])
             ->name('shop.student.lost_found.reports.store');

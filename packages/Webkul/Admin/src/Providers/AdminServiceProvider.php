@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Webkul\Admin\Bouncer;
 use Webkul\Admin\Exceptions\Handler;
+use Webkul\Admin\Helpers\DashboardStatsRegistry;
+use Webkul\Admin\Helpers\MegaSearch;
 use Webkul\Admin\Http\Middleware\Bouncer as BouncerMiddleware;
 use Webkul\Admin\Http\Middleware\Locale;
 
@@ -56,6 +58,18 @@ class AdminServiceProvider extends ServiceProvider
         $this->registerFacades();
 
         $this->registerConfig();
+
+        $this->app->singleton(DashboardStatsRegistry::class);
+
+        $this->app->singleton(MegaSearch::class, function () {
+            $megaSearch = new MegaSearch;
+
+            $megaSearch->register('students', trans('admin::app.components.layouts.header.mega-search.tabs.students'), 'admin.students.search', 20);
+            $megaSearch->register('settings', trans('admin::app.components.layouts.header.mega-search.tabs.settings'), 'admin.settings.search', 30);
+            $megaSearch->register('configurations', trans('admin::app.components.layouts.header.mega-search.tabs.configurations'), 'admin.configuration.search', 40);
+
+            return $megaSearch;
+        });
     }
 
     /**

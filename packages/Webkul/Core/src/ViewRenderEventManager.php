@@ -29,6 +29,7 @@ class ViewRenderEventManager
      */
     public function handleRenderEvent($eventName, $params = null)
     {
+        $this->templates = [];
         $this->params = $params ?? [];
 
         Event::dispatch($eventName, $this);

@@ -399,7 +399,7 @@ class LostAndFoundAuthorizationTest extends TestCase
         $handoverAppService = app(EmployeeHandoverApplicationService::class);
 
         $this->expectException(AuthorizationException::class);
-        $handoverAppService->completeHandover($custodyStaff, $claim, $student, ['verification_method' => 'ID Card']);
+        $handoverAppService->completeHandover($custodyStaff, $item->fresh(), ['verification_method' => 'ID Card']);
     }
 
     public function test_authorized_employee_can_complete_handover(): void
@@ -423,7 +423,7 @@ class LostAndFoundAuthorizationTest extends TestCase
 
         $handoverAppService = app(EmployeeHandoverApplicationService::class);
 
-        $handover = $handoverAppService->completeHandover($handoverOfficer, $claim, $student, ['verification_method' => 'ID Card']);
+        $handover = $handoverAppService->completeHandover($handoverOfficer, $item->fresh(), ['verification_method' => 'ID Card']);
 
         $this->assertNotNull($handover);
         $this->assertEquals(ItemStatus::RETURNED, $item->fresh()->status);

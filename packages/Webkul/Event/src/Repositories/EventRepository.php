@@ -2,6 +2,7 @@
 
 namespace Webkul\Event\Repositories;
 
+use Illuminate\Support\Collection;
 use Webkul\Core\Eloquent\Repository;
 use Webkul\Event\Contracts\Event;
 
@@ -133,5 +134,40 @@ class EventRepository extends Repository
         }
 
         return $event;
+    }
+
+    public function searchByTitle(string $query, ?int $excludedId = null): Collection
+    {
+        $builder = $this->getModel()
+            ->newQuery()
+            ->where('title', 'like', '%'.$query.'%');
+
+        if ($excludedId !== null) {
+            $builder->whereKeyNot($excludedId);
+        }
+
+        return $builder->get();
+    }
+
+    public function availableForSubscription(): Collection
+    {
+        return $this->getModel()
+            ->newQuery()
+            ->select(['id', 'title', 'event_date', 'event_end_date', 'available_seats', 'availability_use_seats', 'availability_use_end_date', 'status'])
+            ->orderByDesc('event_date')
+            ->get()
+            ->filter(fn ($event): bool => $event->status && $event->isCurrentlyAvailable())
+            ->values();
+    }
+
+    public function subscribedByStudent(int $studentId): Collection
+    {
+        return $this->getModel()
+            ->newQuery()
+            ->join('event_student', 'events.id', '=', 'event_student.event_id')
+            ->where('event_student.student_id', $studentId)
+            ->select('events.*', 'event_student.created_at as subscribed_at')
+            ->orderByDesc('events.event_date')
+            ->get();
     }
 }

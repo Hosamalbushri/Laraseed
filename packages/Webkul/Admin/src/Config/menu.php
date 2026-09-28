@@ -13,40 +13,6 @@ return [
     ],
 
     /**
-     * Events.
-     */
-    [
-        'key' => 'events',
-        'name' => 'admin::app.events.title',
-        'route' => 'admin.events.index',
-        'sort' => 6,
-        'icon-class' => 'icon-calendar',
-    ], [
-        'key' => 'events.event',
-        'name' => 'admin::app.events.title',
-        'route' => 'admin.events.index',
-        'sort' => 1,
-        'icon-class' => '',
-    ], [
-        'key' => 'events.categories',
-        'name' => 'admin::app.event-categories.title',
-        'route' => 'admin.events.categories.index',
-        'sort' => 2,
-        'icon-class' => '',
-    ],
-
-    /**
-     * Students.
-     */
-    [
-        'key' => 'students',
-        'name' => 'admin::app.students.title',
-        'route' => 'admin.students.index',
-        'sort' => 7,
-        'icon-class' => 'icon-contact',
-    ],
-
-    /**
      * Settings.
      */
     [
@@ -76,6 +42,20 @@ return [
         'route' => 'admin.settings.users.index',
         'sort' => 3,
         'icon-class' => 'icon-user',
+    ], [
+        'key' => 'settings.website_languages',
+        'name' => 'admin::website-languages.title',
+        'route' => 'admin.settings.website-languages.index',
+        'info' => 'admin::website-languages.info',
+        'sort' => 5,
+        'icon-class' => 'icon-settings',
+    ], [
+        'key' => 'settings.website_languages.overview',
+        'name' => 'admin::website-languages.title',
+        'route' => 'admin.settings.website-languages.index',
+        'info' => 'admin::website-languages.info',
+        'sort' => 1,
+        'icon-class' => 'icon-setting',
     ], [
         'key' => 'settings.shop_theme',
         'name' => 'admin::app.settings.shop-theme.section-title',

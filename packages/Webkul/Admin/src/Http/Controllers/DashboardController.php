@@ -5,6 +5,7 @@ namespace Webkul\Admin\Http\Controllers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
 use Webkul\Admin\Helpers\Dashboard;
+use Webkul\Admin\Helpers\DashboardStatsRegistry;
 
 class DashboardController extends Controller
 {
@@ -13,19 +14,15 @@ class DashboardController extends Controller
      *
      * @var array
      */
-    protected $typeFunctions = [
-        'events-students-over-all' => 'getEventsStudentsOverAllStats',
-        'student-subscriptions-over-time' => 'getStudentSubscriptionsOverTime',
-        'events-status-distribution' => 'getEventsStatusDistribution',
-        'top-subscribed-events' => 'getTopSubscribedEvents',
-    ];
-
     /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct(protected Dashboard $dashboardHelper) {}
+    public function __construct(
+        protected Dashboard $dashboardHelper,
+        protected DashboardStatsRegistry $statsRegistry,
+    ) {}
 
     /**
      * Display a listing of the resource.
@@ -49,14 +46,14 @@ class DashboardController extends Controller
     {
         $type = request()->query('type');
 
-        if (! isset($this->typeFunctions[$type])) {
+        if (! is_string($type) || ! $this->statsRegistry->has($type)) {
             return response()->json([
                 'statistics' => [],
                 'date_range' => $this->dashboardHelper->getDateRange(),
             ], 422);
         }
 
-        $stats = $this->dashboardHelper->{$this->typeFunctions[$type]}();
+        $stats = $this->statsRegistry->resolve($type);
 
         return response()->json([
             'statistics' => $stats,

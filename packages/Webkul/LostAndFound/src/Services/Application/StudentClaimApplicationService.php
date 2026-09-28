@@ -3,6 +3,7 @@
 namespace Webkul\LostAndFound\Services\Application;
 
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Webkul\LostAndFound\Enums\EvidenceType;
 use Webkul\LostAndFound\Models\ClaimEvidence;
 use Webkul\LostAndFound\Models\FoundItem;
@@ -28,7 +29,18 @@ class StudentClaimApplicationService
         $data['found_item_id'] = $item->id;
         unset($data['status'], $data['withdrawn_at']);
 
-        return $this->claimRepository->create($data);
+        $statement = $data['statement'] ?? null;
+        unset($data['statement']);
+
+        return DB::transaction(function () use ($data, $statement): LostFoundClaim {
+            $claim = $this->claimRepository->create($data);
+
+            if ($statement !== null && $statement !== '') {
+                $this->evidenceService->addTextEvidence($claim, EvidenceType::TEXT_DESCRIPTION, $statement);
+            }
+
+            return $claim;
+        });
     }
 
     public function addOwnClaimEvidence(

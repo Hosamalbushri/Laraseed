@@ -5,12 +5,16 @@ namespace Webkul\Student\Providers;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Event as LaravelEvent;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use LogicException;
+use Webkul\Admin\Helpers\MegaSearch;
+use Webkul\Core\ViewRenderEventManager;
 use Webkul\Student\Services\Contracts\UniversityStudentApiContract;
 use Webkul\Student\Services\FakeUniversityStudentApiClient;
+use Webkul\Student\Services\StudentAdminService;
 use Webkul\Student\Services\UniversityStudentApiClient;
 
 class StudentServiceProvider extends ServiceProvider
@@ -20,6 +24,8 @@ class StudentServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->app->singleton(StudentAdminService::class);
+
         $this->registerConfig();
 
         $this->app->singleton(UniversityStudentApiContract::class, function ($app) {
@@ -48,14 +54,27 @@ class StudentServiceProvider extends ServiceProvider
             );
         });
 
-        Route::middleware(['web', 'admin_locale', PreventRequestsDuringMaintenance::class])
-            ->group(__DIR__.'/../Routes/web.php');
-
         $this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
 
         $this->loadTranslationsFrom(__DIR__.'/../Resources/lang', 'student');
 
         $this->loadViewsFrom(__DIR__.'/../Resources/views', 'student');
+
+        $this->loadRoutesFrom(__DIR__.'/../Routes/admin-routes.php');
+
+        Route::middleware(['web', 'admin_locale', PreventRequestsDuringMaintenance::class])
+            ->group(__DIR__.'/../Routes/web.php');
+
+        require __DIR__.'/../Routes/breadcrumbs.php';
+
+        $this->registerViewContributions();
+
+        app(MegaSearch::class)->register(
+            'students',
+            trans('student::app.students.title'),
+            'admin.students.search',
+            20,
+        );
     }
 
     /**
@@ -67,5 +86,52 @@ class StudentServiceProvider extends ServiceProvider
             dirname(__DIR__).'/Config/student.php',
             'student'
         );
+
+        $this->mergeConfigFrom(
+            dirname(__DIR__).'/Config/acl.php',
+            'acl'
+        );
+
+        $this->mergeConfigFrom(
+            dirname(__DIR__).'/Config/menu.php',
+            'menu.admin'
+        );
+
+        $this->registerCoreConfigContributions();
+    }
+
+    protected function registerCoreConfigContributions(): void
+    {
+        $contributions = require dirname(__DIR__).'/Config/core_config.php';
+        $coreConfig = config('core_config', []);
+
+        foreach ($contributions['fields'] as $targetKey => $fields) {
+            foreach ($coreConfig as &$item) {
+                if (($item['key'] ?? null) === $targetKey) {
+                    $item['fields'] = [...($item['fields'] ?? []), ...$fields];
+
+                    break;
+                }
+            }
+
+            unset($item);
+        }
+
+        config(['core_config' => [...$coreConfig, ...$contributions['items']]]);
+    }
+
+    protected function registerViewContributions(): void
+    {
+        $templates = [
+            'admin.components.layouts.header.desktop.mega_search.results' => 'student::admin.layouts.header.desktop-mega-search-results',
+            'admin.components.layouts.header.mobile.mega_search.results' => 'student::admin.layouts.header.mobile-mega-search-results',
+            'admin.components.layouts.header.quick_creation' => 'student::admin.layouts.header.quick-creation-item',
+        ];
+
+        foreach ($templates as $event => $template) {
+            LaravelEvent::listen($event, function (ViewRenderEventManager $manager) use ($template): void {
+                $manager->addTemplate($template);
+            });
+        }
     }
 }

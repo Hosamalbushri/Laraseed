@@ -1,3 +1,5 @@
+@php($megaSearchTabs = app(\Webkul\Admin\Helpers\MegaSearch::class)->tabs())
+
 <v-mega-search>
     <div class="relative flex w-[550px] max-w-[550px] items-center max-lg:w-[400px] ltr:ml-2.5 rtl:mr-2.5">
         <i class="icon-search absolute top-2 flex items-center text-2xl ltr:left-3 rtl:right-3"></i>
@@ -45,48 +47,7 @@
                 </div>
 
                 <!-- Searched Results -->
-                <template v-if="activeTab == 'events'">
-                    <template v-if="isLoading">
-                        <x-admin::shimmer.header.mega-search.products />
-                    </template>
-
-                    <template v-else>
-                        <div class="grid max-h-[400px] overflow-y-auto">
-                            <template v-for="event in searchedResults.events">
-                                <a
-                                    :href="'{{ route('admin.events.edit', ':id') }}'.replace(':id', event.id)"
-                                    class="flex cursor-pointer justify-between gap-2.5 border-b border-slate-300 p-4 last:border-b-0 hover:bg-gray-100 dark:border-gray-800 dark:hover:bg-gray-950"
-                                >
-                                    <div class="grid place-content-start gap-1.5">
-                                        <p class="text-base font-semibold text-gray-600 dark:text-gray-300">
-                                            @{{ event.name }}
-                                        </p>
-                                    </div>
-                                </a>
-                            </template>
-                        </div>
-
-                        <div class="flex border-t p-3 dark:border-gray-800">
-                            <template v-if="searchedResults.events.length">
-                                <a
-                                    :href="'{{ route('admin.events.index') }}?search=:query'.replace(':query', searchTerm)"
-                                    class="cursor-pointer text-xs font-semibold text-brandColor transition-all hover:underline"
-                                >
-                                    @lang('admin::app.components.layouts.header.mega-search.explore-all-events')
-                                </a>
-                            </template>
-
-                            <template v-else>
-                                <a
-                                    href="{{ route('admin.events.index') }}"
-                                    class="cursor-pointer text-xs font-semibold text-brandColor transition-all hover:underline"
-                                >
-                                    @lang('admin::app.components.layouts.header.mega-search.explore-all-events')
-                                </a>
-                            </template>
-                        </div>
-                    </template>
-                </template>
+                {!! view_render_event('admin.components.layouts.header.desktop.mega_search.results') !!}
 
                 <template v-if="activeTab == 'students'">
                     <template v-if="isLoading">
@@ -220,54 +181,17 @@
 
             data() {
                 return  {
-                    activeTab: 'events',
+                    activeTab: @json(array_key_first($megaSearchTabs)),
 
                     isDropdownOpen: false,
 
-                    tabs: {
-                        events: {
-                            key: 'events',
-                            title: "@lang('admin::app.components.layouts.header.mega-search.tabs.events')",
-                            is_active: false,
-                            endpoint: "{{ route('admin.events.search') }}",
-                            query: '',
-                        },
-
-                        students: {
-                            key: 'students',
-                            title: "@lang('admin::app.components.layouts.header.mega-search.tabs.students')",
-                            is_active: false,
-                            endpoint: "{{ route('admin.students.search') }}",
-                            query: '',
-                        },
-
-                        settings: {
-                            key: 'settings',
-                            title: "@lang('admin::app.components.layouts.header.mega-search.tabs.settings')",
-                            is_active: false,
-                            endpoint: "{{ route('admin.settings.search') }}",
-                            query: '',
-                        },
-
-                        configurations: {
-                            key: 'configurations',
-                            title: "@lang('admin::app.components.layouts.header.mega-search.tabs.configurations')",
-                            is_active: false,
-                            endpoint: "{{ route('admin.configuration.search') }}",
-                            query: '',
-                        },
-                    },
+                    tabs: @json($megaSearchTabs),
 
                     isLoading: false,
 
                     searchTerm: '',
 
-                    searchedResults: {
-                        settings: [],
-                        configurations: [],
-                        students: [],
-                        events: [],
-                    },
+                    searchedResults: Object.fromEntries(Object.keys(@json($megaSearchTabs)).map((key) => [key, []])),
 
                     params: {
                         search: '',
@@ -334,12 +258,7 @@
 
                     const tab = this.tabs[this.activeTab];
 
-                    if (
-                        tab.key === 'settings'
-                        || tab.key === 'configurations'
-                        || tab.key === 'students'
-                        || tab.key === 'events'
-                    ) {
+                    if (! tab.query_params) {
                         this.params = null;
 
                         this.search(`${tab.endpoint}?query=${newTerm}`);

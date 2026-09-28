@@ -1,0 +1,22 @@
+<?php
+
+return [
+    'title' => 'Idiomas do site',
+    'info' => 'Gerencie os idiomas do conteúdo do site.',
+    'separate' => 'Isso não altera o idioma da interface administrativa.',
+    'primary' => 'Idioma principal do conteúdo',
+    'manage' => 'Gerenciar idiomas',
+    'saved' => 'Salvo com sucesso.',
+    'add' => 'Adicionar idioma',
+    'code' => 'Código',
+    'name' => 'Nome',
+    'direction' => 'Direção',
+    'order' => 'Ordem',
+    'active' => 'Ativo',
+    'inactive' => 'Inativo',
+    'save' => 'Salvar',
+    'activate' => 'Ativar',
+    'deactivate' => 'Desativar',
+    'make-primary' => 'Definir como principal',
+    'cannot-deactivate-primary' => 'O idioma principal do conteúdo não pode ser desativado.',
+];

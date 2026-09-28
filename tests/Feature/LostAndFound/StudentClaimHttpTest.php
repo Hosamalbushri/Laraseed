@@ -7,6 +7,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 use Tests\TestCase;
 use Webkul\LostAndFound\Enums\ClaimStatus;
 use Webkul\LostAndFound\Enums\EvidenceType;
@@ -14,6 +15,7 @@ use Webkul\LostAndFound\Enums\ItemStatus;
 use Webkul\LostAndFound\Models\FoundItem;
 use Webkul\LostAndFound\Models\LostFoundCategory;
 use Webkul\LostAndFound\Models\LostFoundClaim;
+use Webkul\LostAndFound\Services\Application\StudentClaimApplicationService;
 use Webkul\Student\Models\Student;
 use Webkul\User\Models\User;
 
@@ -95,6 +97,71 @@ class StudentClaimHttpTest extends TestCase
             'claimant_student_id' => $student->id,
             'status' => ClaimStatus::SUBMITTED->value,
         ]);
+
+        $evidence = LostFoundClaim::findOrFail($claimId)->evidence()->sole();
+        $this->assertSame(EvidenceType::TEXT_DESCRIPTION, $evidence->evidence_type);
+        $this->assertSame('This is my laptop.', $evidence->text_value);
+        $this->assertNull($evidence->file_path);
+    }
+
+    public function test_claim_without_statement_has_no_initial_evidence(): void
+    {
+        $student = $this->createStudent();
+        $item = $this->createFoundItem($this->createUser(), $this->createCategory());
+
+        $response = $this->actingAs($student, 'student')->postJson(route('shop.student.lost_found.claims.store'), [
+            'found_item_id' => $item->id,
+        ]);
+
+        $response->assertCreated();
+        $this->assertSame(0, LostFoundClaim::findOrFail($response->json('data.id'))->evidence()->count());
+    }
+
+    public function test_initial_evidence_failure_rolls_back_claim(): void
+    {
+        $student = $this->createStudent();
+        $item = $this->createFoundItem($this->createUser(), $this->createCategory());
+
+        try {
+            app(StudentClaimApplicationService::class)->submitClaim($student, $item, [
+                'statement' => 'My password is secret.',
+            ]);
+            $this->fail('A prohibited statement should have failed.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertStringContainsString('authentication secrets', $exception->getMessage());
+        }
+
+        $this->assertSame(0, LostFoundClaim::where('found_item_id', $item->id)->count());
+        $this->assertDatabaseCount('lost_found_claim_evidence', 0);
+    }
+
+    public function test_text_evidence_endpoint_rejects_image_type_without_side_effects(): void
+    {
+        $student = $this->createStudent();
+        $item = $this->createFoundItem($this->createUser(), $this->createCategory());
+        $claim = app(StudentClaimApplicationService::class)->submitClaim($student, $item);
+
+        $this->actingAs($student, 'student')->postJson(route('shop.student.lost_found.claims.evidence.store', $claim->id), [
+            'type' => EvidenceType::IMAGE_ATTACHMENT->value,
+            'content' => 'not-an-upload',
+        ])->assertUnprocessable()->assertJsonValidationErrors('type');
+
+        $this->assertSame(0, $claim->evidence()->count());
+        $this->assertEmpty(Storage::disk('lost_found_private')->allFiles());
+    }
+
+    public function test_text_evidence_endpoint_rejects_unknown_type(): void
+    {
+        $student = $this->createStudent();
+        $item = $this->createFoundItem($this->createUser(), $this->createCategory());
+        $claim = app(StudentClaimApplicationService::class)->submitClaim($student, $item);
+
+        $this->actingAs($student, 'student')->postJson(route('shop.student.lost_found.claims.evidence.store', $claim->id), [
+            'type' => 'unknown_evidence',
+            'content' => 'This should be rejected.',
+        ])->assertUnprocessable()->assertJsonValidationErrors('type');
+
+        $this->assertSame(0, $claim->evidence()->count());
     }
 
     public function test_claimant_id_spoofing_in_payload_is_ignored(): void

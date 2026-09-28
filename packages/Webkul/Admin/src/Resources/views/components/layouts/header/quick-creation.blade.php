@@ -1,5 +1,7 @@
 <div>
-    @if (bouncer()->hasPermission('events.create')
+    @php($packageQuickCreation = view_render_event('admin.components.layouts.header.quick_creation'))
+
+    @if ($packageQuickCreation !== ''
         || bouncer()->hasPermission('students.create')
         || bouncer()->hasPermission('settings.user.roles.create')
         || bouncer()->hasPermission('settings.user.users.create')
@@ -16,18 +18,7 @@
             <x-slot:content class="mt-2 !p-0">
                 <div class="relative px-2 py-4">
                     <div class="grid grid-cols-2 gap-2 text-center">
-                        <!-- Link to create new Event -->
-                        @if (bouncer()->hasPermission('events.create'))
-                            <div class="rounded-lg bg-white p-2 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-950">
-                                <a href="{{ route('admin.events.create') }}">
-                                    <div class="flex flex-col gap-1">
-                                        <i class="icon-product text-2xl text-gray-600"></i>
-
-                                        <span class="font-medium dark:text-gray-300">@lang('admin::app.events.index.create-btn')</span>
-                                    </div>
-                                </a>
-                            </div>
-                        @endif
+                        {!! $packageQuickCreation !!}
 
                         <!-- Link to create new Student -->
                         @if (bouncer()->hasPermission('students.create'))

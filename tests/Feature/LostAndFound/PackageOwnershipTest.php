@@ -95,7 +95,7 @@ class PackageOwnershipTest extends TestCase
     {
         $routes = collect(app('router')->getRoutes()->getRoutes());
         $employee = $routes->filter(fn ($route): bool => str_starts_with((string) $route->getName(), 'admin.lost_found.'));
-        $student = $routes->filter(fn ($route): bool => str_starts_with((string) $route->getName(), 'shop.student.lost_found.'));
+        $student = $routes->filter(fn ($route): bool => str_starts_with((string) $route->getName(), 'student.lost_found.'));
 
         $this->assertCount(14, $employee);
         $this->assertCount(7, $student);

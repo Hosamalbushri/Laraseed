@@ -62,7 +62,6 @@
             "Webkul\\Installer\\": "packages/Webkul/Installer/src",
             "Webkul\\User\\": "packages/Webkul/User/src",
             "Webkul\\Event\\": "packages/Webkul/Event/src",
-            "Webkul\\Shop\\": "packages/Webkul/Shop/src",
             "Webkul\\Student\\": "packages/Webkul/Student/src",
             "Webkul\\LostAndFound\\": "packages/Webkul/LostAndFound/src"
         }

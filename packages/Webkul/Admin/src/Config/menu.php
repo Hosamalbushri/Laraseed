@@ -56,20 +56,6 @@ return [
         'info' => 'admin::website-languages.info',
         'sort' => 1,
         'icon-class' => 'icon-setting',
-    ], [
-        'key' => 'settings.shop_theme',
-        'name' => 'admin::app.settings.shop-theme.section-title',
-        'route' => 'admin.settings.shop-theme.index',
-        'info' => 'admin::app.settings.shop-theme.section-info',
-        'sort' => 4,
-        'icon-class' => 'icon-settings',
-    ], [
-        'key' => 'settings.shop_theme.homepage',
-        'name' => 'admin::app.settings.shop-theme.index.title',
-        'route' => 'admin.settings.shop-theme.index',
-        'info' => 'admin::app.settings.shop-theme.index.info',
-        'sort' => 1,
-        'icon-class' => 'icon-setting',
     ],
 
     /**

@@ -82,7 +82,7 @@ class StudentClaimHttpTest extends TestCase
         $item = $this->createFoundItem($user, $category);
 
         $response = $this->actingAs($student, 'student')
-            ->postJson(route('shop.student.lost_found.claims.store'), [
+            ->postJson(route('student.lost_found.claims.store'), [
                 'found_item_id' => $item->id,
                 'statement' => 'This is my laptop.',
             ]);
@@ -109,7 +109,7 @@ class StudentClaimHttpTest extends TestCase
         $student = $this->createStudent();
         $item = $this->createFoundItem($this->createUser(), $this->createCategory());
 
-        $response = $this->actingAs($student, 'student')->postJson(route('shop.student.lost_found.claims.store'), [
+        $response = $this->actingAs($student, 'student')->postJson(route('student.lost_found.claims.store'), [
             'found_item_id' => $item->id,
         ]);
 
@@ -141,7 +141,7 @@ class StudentClaimHttpTest extends TestCase
         $item = $this->createFoundItem($this->createUser(), $this->createCategory());
         $claim = app(StudentClaimApplicationService::class)->submitClaim($student, $item);
 
-        $this->actingAs($student, 'student')->postJson(route('shop.student.lost_found.claims.evidence.store', $claim->id), [
+        $this->actingAs($student, 'student')->postJson(route('student.lost_found.claims.evidence.store', $claim->id), [
             'type' => EvidenceType::IMAGE_ATTACHMENT->value,
             'content' => 'not-an-upload',
         ])->assertUnprocessable()->assertJsonValidationErrors('type');
@@ -156,7 +156,7 @@ class StudentClaimHttpTest extends TestCase
         $item = $this->createFoundItem($this->createUser(), $this->createCategory());
         $claim = app(StudentClaimApplicationService::class)->submitClaim($student, $item);
 
-        $this->actingAs($student, 'student')->postJson(route('shop.student.lost_found.claims.evidence.store', $claim->id), [
+        $this->actingAs($student, 'student')->postJson(route('student.lost_found.claims.evidence.store', $claim->id), [
             'type' => 'unknown_evidence',
             'content' => 'This should be rejected.',
         ])->assertUnprocessable()->assertJsonValidationErrors('type');
@@ -173,7 +173,7 @@ class StudentClaimHttpTest extends TestCase
         $item = $this->createFoundItem($user, $category);
 
         $response = $this->actingAs($student1, 'student')
-            ->postJson(route('shop.student.lost_found.claims.store'), [
+            ->postJson(route('student.lost_found.claims.store'), [
                 'found_item_id' => $item->id,
                 'claimant_student_id' => $student2->id,
                 'student_id' => $student2->id,
@@ -192,7 +192,7 @@ class StudentClaimHttpTest extends TestCase
         $category = $this->createCategory();
         $item = $this->createFoundItem($user, $category);
 
-        $response = $this->postJson(route('shop.student.lost_found.claims.store'), [
+        $response = $this->postJson(route('student.lost_found.claims.store'), [
             'found_item_id' => $item->id,
         ]);
 
@@ -205,7 +205,7 @@ class StudentClaimHttpTest extends TestCase
         $category = $this->createCategory();
         $item = $this->createFoundItem($user, $category);
 
-        $response = $this->post(route('shop.student.lost_found.claims.store'), [
+        $response = $this->post(route('student.lost_found.claims.store'), [
             'found_item_id' => $item->id,
         ]);
 
@@ -219,7 +219,7 @@ class StudentClaimHttpTest extends TestCase
         $item = $this->createFoundItem($user, $category);
 
         $response = $this->actingAs($user, 'user')
-            ->postJson(route('shop.student.lost_found.claims.store'), [
+            ->postJson(route('student.lost_found.claims.store'), [
                 'found_item_id' => $item->id,
             ]);
 
@@ -234,13 +234,13 @@ class StudentClaimHttpTest extends TestCase
         $item = $this->createFoundItem($user, $category);
 
         $this->actingAs($student, 'student')
-            ->postJson(route('shop.student.lost_found.claims.store'), [
+            ->postJson(route('student.lost_found.claims.store'), [
                 'found_item_id' => $item->id,
             ])
             ->assertStatus(201);
 
         $response = $this->actingAs($student, 'student')
-            ->postJson(route('shop.student.lost_found.claims.store'), [
+            ->postJson(route('student.lost_found.claims.store'), [
                 'found_item_id' => $item->id,
             ]);
 
@@ -256,13 +256,13 @@ class StudentClaimHttpTest extends TestCase
         $item = $this->createFoundItem($user, $category);
 
         $storeResponse = $this->actingAs($student, 'student')
-            ->postJson(route('shop.student.lost_found.claims.store'), [
+            ->postJson(route('student.lost_found.claims.store'), [
                 'found_item_id' => $item->id,
             ]);
         $claimId = $storeResponse->json('data.id');
 
         $response = $this->actingAs($student, 'student')
-            ->postJson(route('shop.student.lost_found.claims.evidence.store', $claimId), [
+            ->postJson(route('student.lost_found.claims.evidence.store', $claimId), [
                 'type' => EvidenceType::MARKING_DETAIL->value,
                 'content' => 'Initials HB engraved on bottom right corner.',
             ]);
@@ -285,13 +285,13 @@ class StudentClaimHttpTest extends TestCase
         $item = $this->createFoundItem($user, $category);
 
         $storeResponse = $this->actingAs($student1, 'student')
-            ->postJson(route('shop.student.lost_found.claims.store'), [
+            ->postJson(route('student.lost_found.claims.store'), [
                 'found_item_id' => $item->id,
             ]);
         $claimId = $storeResponse->json('data.id');
 
         $response = $this->actingAs($student2, 'student')
-            ->postJson(route('shop.student.lost_found.claims.evidence.store', $claimId), [
+            ->postJson(route('student.lost_found.claims.evidence.store', $claimId), [
                 'type' => EvidenceType::MARKING_DETAIL->value,
                 'content' => 'Malicious evidence injection',
             ]);
@@ -310,13 +310,13 @@ class StudentClaimHttpTest extends TestCase
         $item = $this->createFoundItem($user, $category);
 
         $storeResponse = $this->actingAs($student, 'student')
-            ->postJson(route('shop.student.lost_found.claims.store'), [
+            ->postJson(route('student.lost_found.claims.store'), [
                 'found_item_id' => $item->id,
             ]);
         $claimId = $storeResponse->json('data.id');
 
         $response = $this->actingAs($student, 'student')
-            ->postJson(route('shop.student.lost_found.claims.images.store', $claimId), [
+            ->postJson(route('student.lost_found.claims.images.store', $claimId), [
                 'image' => UploadedFile::fake()->image('receipt.jpg', 400, 400),
             ]);
 
@@ -335,14 +335,14 @@ class StudentClaimHttpTest extends TestCase
         $item = $this->createFoundItem($user, $category);
 
         $storeResponse = $this->actingAs($student, 'student')
-            ->postJson(route('shop.student.lost_found.claims.store'), [
+            ->postJson(route('student.lost_found.claims.store'), [
                 'found_item_id' => $item->id,
             ]);
         $claimId = $storeResponse->json('data.id');
 
         // 3000 KB > 2048 KB limit
         $response = $this->actingAs($student, 'student')
-            ->postJson(route('shop.student.lost_found.claims.images.store', $claimId), [
+            ->postJson(route('student.lost_found.claims.images.store', $claimId), [
                 'image' => UploadedFile::fake()->create('huge.jpg', 3000, 'image/jpeg'),
             ]);
 
@@ -365,13 +365,13 @@ class StudentClaimHttpTest extends TestCase
         $item = $this->createFoundItem($user, $category);
 
         $storeResponse = $this->actingAs($student1, 'student')
-            ->postJson(route('shop.student.lost_found.claims.store'), [
+            ->postJson(route('student.lost_found.claims.store'), [
                 'found_item_id' => $item->id,
             ]);
         $claimId = $storeResponse->json('data.id');
 
         $response = $this->actingAs($student2, 'student')
-            ->postJson(route('shop.student.lost_found.claims.images.store', $claimId), [
+            ->postJson(route('student.lost_found.claims.images.store', $claimId), [
                 'image' => UploadedFile::fake()->image('unauthorized.jpg', 400, 400),
             ]);
 
@@ -387,13 +387,13 @@ class StudentClaimHttpTest extends TestCase
         $item = $this->createFoundItem($user, $category);
 
         $storeResponse = $this->actingAs($student, 'student')
-            ->postJson(route('shop.student.lost_found.claims.store'), [
+            ->postJson(route('student.lost_found.claims.store'), [
                 'found_item_id' => $item->id,
             ]);
         $claimId = $storeResponse->json('data.id');
 
         $response = $this->actingAs($student, 'student')
-            ->postJson(route('shop.student.lost_found.claims.withdraw', $claimId));
+            ->postJson(route('student.lost_found.claims.withdraw', $claimId));
 
         $response->assertStatus(200)
             ->assertJsonPath('data.status', ClaimStatus::WITHDRAWN->value);
@@ -413,13 +413,13 @@ class StudentClaimHttpTest extends TestCase
         $item = $this->createFoundItem($user, $category);
 
         $storeResponse = $this->actingAs($student1, 'student')
-            ->postJson(route('shop.student.lost_found.claims.store'), [
+            ->postJson(route('student.lost_found.claims.store'), [
                 'found_item_id' => $item->id,
             ]);
         $claimId = $storeResponse->json('data.id');
 
         $response = $this->actingAs($student2, 'student')
-            ->postJson(route('shop.student.lost_found.claims.withdraw', $claimId));
+            ->postJson(route('student.lost_found.claims.withdraw', $claimId));
 
         $response->assertStatus(404);
 

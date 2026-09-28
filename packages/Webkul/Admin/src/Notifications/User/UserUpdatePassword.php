@@ -28,7 +28,7 @@ class UserUpdatePassword extends Mailable
     {
         return $this->from(core()->getSenderEmailDetails()['email'], core()->getSenderEmailDetails()['name'])
             ->to($this->user->email, $this->user->name)
-            ->subject(trans('shop::app.mail.update-password.subject'))
-            ->view('shop::emails.users.update-password', ['user' => $this->user]);
+            ->subject(trans('admin::app.emails.common.user.update-password.subject'))
+            ->view('admin::emails.users.update-password', ['user' => $this->user]);
     }
 }

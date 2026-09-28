@@ -43,18 +43,6 @@
             @include('admin::components.layouts.header.mobile.mega-search')
         </div>
 
-        <!-- Visit storefront (public site) -->
-        <a
-            href="{{ route('shop.home.index') }}"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="icon-forward p-1.5 rounded-md text-2xl cursor-pointer transition-all hover:bg-gray-100 dark:hover:bg-gray-950"
-            title="@lang('admin::app.layouts.visit-website')"
-            aria-label="@lang('admin::app.layouts.visit-website')"
-        >
-{{--            <span class="icon-forward"></span>--}}
-        </a>
-
         <!-- Dark mode -->
         <v-dark>
             <div class="flex">

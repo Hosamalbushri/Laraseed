@@ -1,6 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Webkul\Student\Http\Controllers\StudentSessionController;
+
+Route::get('/', [StudentSessionController::class, 'create'])->name('home');
 
 $adminPath = trim((string) config('app.admin_path', 'admin'), '/');
 

@@ -101,18 +101,6 @@ class User extends Authenticatable implements UserContract
 
         $permissions = $this->role->permissions ?? [];
 
-        if (in_array($permission, $permissions, true)) {
-            return true;
-        }
-
-        if ($permission === 'settings.shop_theme' && in_array('settings.shop_theme.homepage', $permissions, true)) {
-            return true;
-        }
-
-        if ($permission === 'settings.shop_theme.homepage' && in_array('settings.shop_theme', $permissions, true)) {
-            return true;
-        }
-
-        return false;
+        return in_array($permission, $permissions, true);
     }
 }

@@ -27,7 +27,7 @@ it('rejects unauthenticated requests to protected admin routes with a redirect t
 });
 
 it('rejects unauthenticated requests to protected student routes with a redirect to student login', function () {
-    $this->get(route('shop.student.account.edit'))
+    $this->post(route('student.lost_found.reports.store'), [])
         ->assertRedirect(route('student.login'));
 });
 

@@ -31,20 +31,6 @@ return [
     ],
 
     'fields' => [
-        'general.store.navigation' => [
-            [
-                'name' => 'show_events',
-                'title' => 'event::app.events.title',
-                'type' => 'boolean',
-                'default' => true,
-            ], [
-                'name' => 'events_label',
-                'title' => 'event::app.events.title',
-                'type' => 'text',
-                'default' => 'Events',
-                'validation' => 'max:100',
-            ],
-        ],
         'general.settings.menu' => [
             [
                 'name' => 'events',

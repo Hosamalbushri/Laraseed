@@ -1,9 +1,14 @@
-<x-shop::layouts
-    :has-header="true"
-    :has-feature="false"
-    :has-footer="true"
-    :title="core()->getConfigData('general.store.student_login.title') ?: core()->getConfigData('general.design.student_login.title') ?: __('student::app.login.title')"
->
+<!DOCTYPE html>
+<html lang="{{ app()->getLocale() }}" dir="{{ in_array(app()->getLocale(), ['ar', 'fa', 'he']) ? 'rtl' : 'ltr' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>{{ core()->getConfigData('general.store.student_login.title') ?: core()->getConfigData('general.design.student_login.title') ?: __('student::app.login.title') }}</title>
+    @stack('meta')
+    @stack('styles')
+</head>
+<body class="bg-slate-50 font-sans text-zinc-800 antialiased">
     @php
         $cfg = fn (string $key): string => trim((string) (
             core()->getConfigData('general.store.student_login.'.$key)
@@ -311,36 +316,25 @@
                     </button>
                 </form>
 
-                @if (\Illuminate\Support\Facades\Route::has('shop.home.index'))
-                    <p class="mt-6 text-center text-sm text-zinc-500">
-                        <a
-                            href="{{ route('shop.home.index') }}"
-                            class="font-semibold underline-offset-4 hover:underline"
-                            style="color: var(--login-primary)"
-                        >
-                            {{ $t('back_portal') }}
-                        </a>
-                    </p>
-                @endif
             </div>
         </div>
     </section>
 
-    @push('scripts')
-        <script>
-            (function () {
-                var btn = document.getElementById('student-login-toggle-password');
-                var input = document.getElementById('password');
-                var icon = document.getElementById('student-login-toggle-password-icon');
-                if (!btn || !input || !icon) return;
-                btn.addEventListener('click', function () {
-                    var show = input.type === 'password';
-                    input.type = show ? 'text' : 'password';
-                    btn.setAttribute('aria-pressed', show ? 'true' : 'false');
-                    btn.setAttribute('aria-label', show ? btn.getAttribute('data-label-hide') : btn.getAttribute('data-label-show'));
-                    icon.className = show ? 'far fa-eye-slash' : 'far fa-eye';
-                });
-            })();
-        </script>
-    @endpush
-</x-shop::layouts>
+    @stack('scripts')
+    <script>
+        (function () {
+            var btn = document.getElementById('student-login-toggle-password');
+            var input = document.getElementById('password');
+            var icon = document.getElementById('student-login-toggle-password-icon');
+            if (!btn || !input || !icon) return;
+            btn.addEventListener('click', function () {
+                var show = input.type === 'password';
+                input.type = show ? 'text' : 'password';
+                btn.setAttribute('aria-pressed', show ? 'true' : 'false');
+                btn.setAttribute('aria-label', show ? btn.getAttribute('data-label-hide') : btn.getAttribute('data-label-show'));
+                icon.className = show ? 'far fa-eye-slash' : 'far fa-eye';
+            });
+        })();
+    </script>
+</body>
+</html>

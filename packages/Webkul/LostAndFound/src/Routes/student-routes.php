@@ -8,23 +8,23 @@ Route::prefix('student/lost-found')
     ->middleware(['web', 'admin_locale', 'auth:student'])
     ->group(function () {
         Route::post('reports', [StudentLostReportController::class, 'store'])
-            ->name('shop.student.lost_found.reports.store');
+            ->name('student.lost_found.reports.store');
 
         Route::put('reports/{id}', [StudentLostReportController::class, 'update'])
-            ->name('shop.student.lost_found.reports.update');
+            ->name('student.lost_found.reports.update');
 
         Route::post('reports/{id}/images', [StudentLostReportController::class, 'uploadImage'])
-            ->name('shop.student.lost_found.reports.images.store');
+            ->name('student.lost_found.reports.images.store');
 
         Route::post('claims', [StudentClaimController::class, 'store'])
-            ->name('shop.student.lost_found.claims.store');
+            ->name('student.lost_found.claims.store');
 
         Route::post('claims/{id}/evidence', [StudentClaimController::class, 'addEvidence'])
-            ->name('shop.student.lost_found.claims.evidence.store');
+            ->name('student.lost_found.claims.evidence.store');
 
         Route::post('claims/{id}/images', [StudentClaimController::class, 'uploadImage'])
-            ->name('shop.student.lost_found.claims.images.store');
+            ->name('student.lost_found.claims.images.store');
 
         Route::post('claims/{id}/withdraw', [StudentClaimController::class, 'withdraw'])
-            ->name('shop.student.lost_found.claims.withdraw');
+            ->name('student.lost_found.claims.withdraw');
     });

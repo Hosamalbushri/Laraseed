@@ -138,8 +138,6 @@ it('loads Event routes views translations ACL menu migrations and dashboard cont
     $coreConfig = collect(config('core_config'))->keyBy('key');
 
     expect($coreConfig)->toHaveKey('general.store.events_page')
-        ->and(collect($coreConfig['general.store.navigation']['fields'])->pluck('name')->all())
-        ->toContain('show_events', 'events_label')
         ->and(collect($coreConfig['general.settings.menu']['fields'])->pluck('name')->all())
         ->toContain('events', 'events.event', 'events.categories');
 });

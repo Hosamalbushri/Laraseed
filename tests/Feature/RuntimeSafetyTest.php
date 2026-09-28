@@ -33,12 +33,12 @@ function runtimeAuditUser(array $permissions): User
 }
 
 it('redirects a student guest to the student login', function () {
-    $this->get(route('shop.student.account.edit'))
+    $this->post(route('student.lost_found.reports.store'), [])
         ->assertRedirect(route('student.login'));
 });
 
 it('returns JSON 401 for an unauthenticated student API-style request', function () {
-    $this->getJson(route('shop.student.account.edit'))
+    $this->postJson(route('student.lost_found.reports.store'), [])
         ->assertUnauthorized();
 });
 
@@ -111,36 +111,13 @@ it('uses the university API only for first student login then retains local auth
     $this->assertAuthenticatedAs($student, 'student');
 });
 
-it('boots the public portal and core Event pages', function () {
-    $this->get(route('shop.home.index'))->assertOk();
-    $this->get(route('shop.events.index'))->assertOk();
+it('boots student login and core admin pages', function () {
     $this->get(route('student.login'))->assertOk();
 
     $this->actingAs(getDefaultAdmin(), 'user')
         ->get(route('admin.events.index'))
         ->assertOk();
     $this->get(route('admin.events.categories.index'))->assertOk();
-
-    $event = Event::create([
-        'title' => 'Runtime Audit Event',
-        'status' => true,
-        'available_seats' => 2,
-        'availability_use_seats' => true,
-        'availability_use_end_date' => false,
-    ]);
-    $student = Student::create([
-        'university_card_number' => 'PORTAL-'.uniqid(),
-        'password' => 'portal-password',
-        'name' => 'Portal Audit Student',
-    ]);
-
-    $this->get(route('shop.events.show', $event->id))->assertOk();
-    $this->actingAs($student, 'student')
-        ->postJson(route('shop.events.subscribe', $event->id))
-        ->assertOk()
-        ->assertJsonPath('already_registered', false);
-    $this->get(route('shop.student.events.index'))->assertOk();
-    $this->get(route('shop.student.account.edit'))->assertOk();
 });
 
 it('does not expose the installer after an installation marker exists', function () {

@@ -4,12 +4,11 @@ use Illuminate\Support\Facades\Route;
 use Webkul\Admin\Http\Controllers\Settings\GroupController;
 use Webkul\Admin\Http\Controllers\Settings\RoleController;
 use Webkul\Admin\Http\Controllers\Settings\SettingController;
-use Webkul\Admin\Http\Controllers\Settings\ShopThemeCustomizationController;
 use Webkul\Admin\Http\Controllers\Settings\UserController;
 use Webkul\Admin\Http\Controllers\Settings\WebsiteLanguageController;
 
 /**
- * Settings routes (minimal: groups, roles, users, shop theme + settings search).
+ * Settings routes (minimal: groups, roles, users + settings search).
  */
 Route::prefix('settings')->group(function () {
     Route::controller(WebsiteLanguageController::class)->prefix('website-languages')->group(function () {
@@ -59,21 +58,6 @@ Route::prefix('settings')->group(function () {
         Route::put('edit/{id}', 'update')->name('admin.settings.roles.update');
 
         Route::delete('{id}', 'destroy')->name('admin.settings.roles.delete');
-    });
-
-    /**
-     * Student portal homepage (Bagisto-style theme customizations).
-     */
-    Route::controller(ShopThemeCustomizationController::class)->prefix('shop-theme')->group(function () {
-        Route::get('', 'index')->name('admin.settings.shop-theme.index');
-
-        Route::post('create', 'store')->name('admin.settings.shop-theme.store');
-
-        Route::get('edit/{id}', 'edit')->name('admin.settings.shop-theme.edit');
-
-        Route::put('edit/{id}', 'update')->name('admin.settings.shop-theme.update');
-
-        Route::delete('{id}', 'destroy')->name('admin.settings.shop-theme.destroy');
     });
 
     /**

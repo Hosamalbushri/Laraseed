@@ -2451,4 +2451,17 @@ return [
 
     ],
 
+    'emails' => [
+        'common' => [
+            'user' => [
+                'update-password' => [
+                    'subject' => 'Password Updated Notification',
+                    'dear' => 'Dear :username',
+                    'info' => 'This email is to inform you that your password has been updated.',
+                    'thanks' => 'Thanks!',
+                ],
+            ],
+        ],
+    ],
+
 ];

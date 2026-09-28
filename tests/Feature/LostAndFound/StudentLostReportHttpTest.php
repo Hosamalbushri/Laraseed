@@ -61,7 +61,7 @@ class StudentLostReportHttpTest extends TestCase
         $category = $this->createCategory();
 
         $response = $this->actingAs($student, 'student')
-            ->postJson(route('shop.student.lost_found.reports.store'), [
+            ->postJson(route('student.lost_found.reports.store'), [
                 'category_id' => $category->id,
                 'title' => 'Lost Water Bottle',
                 'description' => 'Blue metal bottle left in Library',
@@ -83,7 +83,7 @@ class StudentLostReportHttpTest extends TestCase
     {
         $category = $this->createCategory();
 
-        $response = $this->postJson(route('shop.student.lost_found.reports.store'), [
+        $response = $this->postJson(route('student.lost_found.reports.store'), [
             'category_id' => $category->id,
             'title' => 'Unauthenticated Report',
         ]);
@@ -95,7 +95,7 @@ class StudentLostReportHttpTest extends TestCase
     {
         $category = $this->createCategory();
 
-        $response = $this->post(route('shop.student.lost_found.reports.store'), [
+        $response = $this->post(route('student.lost_found.reports.store'), [
             'category_id' => $category->id,
             'title' => 'Unauthenticated Report',
         ]);
@@ -109,7 +109,7 @@ class StudentLostReportHttpTest extends TestCase
         $category = $this->createCategory();
 
         $response = $this->actingAs($user, 'user')
-            ->postJson(route('shop.student.lost_found.reports.store'), [
+            ->postJson(route('student.lost_found.reports.store'), [
                 'category_id' => $category->id,
                 'title' => 'User Guard Attempt',
             ]);
@@ -124,7 +124,7 @@ class StudentLostReportHttpTest extends TestCase
         $category = $this->createCategory();
 
         $response = $this->actingAs($student1, 'student')
-            ->postJson(route('shop.student.lost_found.reports.store'), [
+            ->postJson(route('student.lost_found.reports.store'), [
                 'student_id' => $student2->id,
                 'category_id' => $category->id,
                 'title' => 'Spoof Attempt Report',
@@ -143,7 +143,7 @@ class StudentLostReportHttpTest extends TestCase
         $category = $this->createCategory();
 
         $response = $this->actingAs($student, 'student')
-            ->postJson(route('shop.student.lost_found.reports.store'), [
+            ->postJson(route('student.lost_found.reports.store'), [
                 'category_id' => $category->id,
                 'title' => 'Workflow Injection Report',
                 'status' => ReportStatus::RESOLVED->value,
@@ -173,7 +173,7 @@ class StudentLostReportHttpTest extends TestCase
         ]);
 
         $response = $this->actingAs($student, 'student')
-            ->putJson(route('shop.student.lost_found.reports.update', $report->id), [
+            ->putJson(route('student.lost_found.reports.update', $report->id), [
                 'title' => 'Updated Title via HTTP',
             ]);
 
@@ -196,7 +196,7 @@ class StudentLostReportHttpTest extends TestCase
         ]);
 
         $response = $this->actingAs($student2, 'student')
-            ->putJson(route('shop.student.lost_found.reports.update', $report1->id), [
+            ->putJson(route('student.lost_found.reports.update', $report1->id), [
                 'title' => 'Hacked Title',
             ]);
 
@@ -216,7 +216,7 @@ class StudentLostReportHttpTest extends TestCase
         ]);
 
         $response = $this->actingAs($student, 'student')
-            ->postJson(route('shop.student.lost_found.reports.images.store', $report->id), [
+            ->postJson(route('student.lost_found.reports.images.store', $report->id), [
                 'image' => UploadedFile::fake()->image('reference.jpg', 300, 300),
             ]);
 
@@ -242,7 +242,7 @@ class StudentLostReportHttpTest extends TestCase
         $oversizedFile = UploadedFile::fake()->create('huge.jpg', 3000, 'image/jpeg');
 
         $response = $this->actingAs($student, 'student')
-            ->postJson(route('shop.student.lost_found.reports.images.store', $report->id), [
+            ->postJson(route('student.lost_found.reports.images.store', $report->id), [
                 'image' => $oversizedFile,
             ]);
 
@@ -266,7 +266,7 @@ class StudentLostReportHttpTest extends TestCase
         ]);
 
         $response = $this->actingAs($student2, 'student')
-            ->postJson(route('shop.student.lost_found.reports.images.store', $report1->id), [
+            ->postJson(route('student.lost_found.reports.images.store', $report1->id), [
                 'image' => UploadedFile::fake()->image('unauthorized.jpg', 300, 300),
             ]);
 
@@ -281,7 +281,7 @@ class StudentLostReportHttpTest extends TestCase
         $student = $this->createStudent();
 
         $response = $this->actingAs($student, 'student')
-            ->postJson(route('shop.student.lost_found.reports.store'), [
+            ->postJson(route('student.lost_found.reports.store'), [
                 'title' => '',
             ]);
 

@@ -107,37 +107,6 @@ return [
         'route' => ['admin.settings.website-languages.activate', 'admin.settings.website-languages.deactivate', 'admin.settings.website-languages.primary'],
         'sort' => 4,
     ], [
-        'key' => 'settings.shop_theme',
-        'name' => 'admin::app.settings.shop-theme.acl.title',
-        'route' => 'admin.settings.shop-theme.index',
-        'sort' => 3,
-    ], [
-        'key' => 'settings.shop_theme.homepage',
-        'name' => 'admin::app.settings.shop-theme.acl.homepage',
-        'route' => [
-            'admin.settings.shop-theme.index',
-            'admin.settings.shop-theme.edit',
-            'admin.settings.shop-theme.update',
-            'admin.settings.shop-theme.store',
-            'admin.settings.shop-theme.destroy',
-        ],
-        'sort' => 1,
-    ], [
-        'key' => 'settings.shop_theme.create',
-        'name' => 'admin::app.acl.create',
-        'route' => 'admin.settings.shop-theme.store',
-        'sort' => 1,
-    ], [
-        'key' => 'settings.shop_theme.edit',
-        'name' => 'admin::app.acl.edit',
-        'route' => ['admin.settings.shop-theme.edit', 'admin.settings.shop-theme.update'],
-        'sort' => 2,
-    ], [
-        'key' => 'settings.shop_theme.delete',
-        'name' => 'admin::app.acl.delete',
-        'route' => 'admin.settings.shop-theme.destroy',
-        'sort' => 3,
-    ], [
         'key' => 'configuration',
         'name' => 'admin::app.acl.configuration',
         'route' => [

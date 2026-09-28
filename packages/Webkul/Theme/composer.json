@@ -1,0 +1,23 @@
+{
+    "name": "webkul/theme",
+    "type": "library",
+    "description": "CampusHub Theme Engine Presentation Foundation",
+    "authors": [
+        {
+            "name": "Webkul",
+            "email": "sales@webkul.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Webkul\\Theme\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Webkul\\Theme\\Providers\\ThemeServiceProvider"
+            ]
+        }
+    }
+}

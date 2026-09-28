@@ -64,7 +64,8 @@
             "Webkul\\Event\\": "packages/Webkul/Event/src",
             "Webkul\\Student\\": "packages/Webkul/Student/src",
             "Webkul\\LostAndFound\\": "packages/Webkul/LostAndFound/src",
-            "Webkul\\Web\\": "packages/Webkul/Web/src"
+            "Webkul\\Web\\": "packages/Webkul/Web/src",
+            "Webkul\\Theme\\": "packages/Webkul/Theme/src"
         }
     },
     "autoload-dev": {

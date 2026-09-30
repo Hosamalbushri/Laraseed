@@ -1,78 +1,103 @@
-/**
- * CampusHub Web Interaction Kernel
- * Progressive enhancement and event delegation for public web components.
- * Zero external dependencies, idempotent, accessible, reduced-motion aware.
- */
-(function (window, document) {
-    'use strict';
+import { mountPublicWebApp } from './vue/app';
 
-    if (window.__campusHubWebInteractionsInitialized) {
+/**
+ * CampusHub public Web runtime.
+ *
+ * Vue owns stateful Web components. The small delegated layer remains only for
+ * legacy shell navigation and dismissible alerts until those consumers migrate.
+ */
+function initializeDelegatedInteractions() {
+    const root = document.documentElement;
+
+    if (root.dataset.webDelegatedInteractions === 'ready') {
         return;
     }
-    window.__campusHubWebInteractionsInitialized = true;
 
-    // Delegated click handler on document for maximum performance and minimal memory footprint
-    document.addEventListener('click', function (event) {
-        // 1. Accordion Trigger
-        const trigger = event.target.closest('[data-web-accordion-trigger]');
-        if (trigger) {
-            handleAccordionToggle(trigger);
+    root.dataset.webDelegatedInteractions = 'ready';
+
+    document.addEventListener('click', (event) => {
+        const navToggle = event.target.closest('[data-web-nav-toggle]');
+
+        if (navToggle) {
+            toggleNavigation(navToggle);
             return;
         }
 
-        // 2. Alert Dismiss
+        const navPanelLink = event.target.closest('[data-web-nav-panel] a[href]');
+
+        if (navPanelLink) {
+            const panel = navPanelLink.closest('[data-web-nav-panel]');
+
+            if (panel?.id) {
+                closeNavigation(panel.id, false);
+            }
+        }
+
         const alertDismiss = event.target.closest('[data-web-alert-dismiss]');
+
         if (alertDismiss) {
-            handleAlertDismiss(alertDismiss);
-            return;
+            alertDismiss.closest('[data-web-alert]')?.remove();
         }
     });
 
-    /**
-     * Handle accordion item toggle with single/multi open support and ARIA synchronization.
-     *
-     * @param {HTMLElement} trigger
-     */
-    function handleAccordionToggle(trigger) {
-        const panelId = trigger.getAttribute('aria-controls');
-        if (!panelId) return;
+    document.addEventListener('keydown', (event) => {
+        if (event.key !== 'Escape' && event.key !== 'Esc') {
+            return;
+        }
 
-        const panel = document.getElementById(panelId);
-        if (!panel) return;
+        document.querySelectorAll('[data-web-nav-toggle][aria-expanded="true"]').forEach((toggle) => {
+            const panelId = toggle.getAttribute('aria-controls');
 
-        const isExpanded = trigger.getAttribute('aria-expanded') === 'true';
-        const accordion = trigger.closest('[data-web-accordion]');
-        const allowMultiple = accordion && accordion.getAttribute('data-web-accordion-always-open') === 'true';
+            panelId ? closeNavigation(panelId, true) : toggle.setAttribute('aria-expanded', 'false');
+        });
+    });
 
-        // If single-open accordion, collapse other open items in the same container
-        if (!allowMultiple && !isExpanded && accordion) {
-            const activeTriggers = accordion.querySelectorAll('[data-web-accordion-trigger][aria-expanded="true"]');
-            activeTriggers.forEach(function (activeTrigger) {
-                if (activeTrigger !== trigger) {
-                    activeTrigger.setAttribute('aria-expanded', 'false');
-                    const activePanelId = activeTrigger.getAttribute('aria-controls');
-                    const activePanel = activePanelId ? document.getElementById(activePanelId) : null;
-                    if (activePanel) {
-                        activePanel.hidden = true;
-                    }
-                }
+    if (typeof window.matchMedia === 'function') {
+        const desktop = window.matchMedia('(min-width: 48rem)');
+
+        desktop.addEventListener?.('change', (event) => {
+            if (! event.matches) {
+                return;
+            }
+
+            document.querySelectorAll('[data-web-nav-toggle][aria-expanded="true"]').forEach((toggle) => {
+                const panelId = toggle.getAttribute('aria-controls');
+
+                panelId ? closeNavigation(panelId, false) : toggle.setAttribute('aria-expanded', 'false');
             });
-        }
+        });
+    }
+}
 
-        const nextState = !isExpanded;
-        trigger.setAttribute('aria-expanded', String(nextState));
-        panel.hidden = !nextState;
+function toggleNavigation(toggle) {
+    const panelId = toggle.getAttribute('aria-controls');
+    const panel = panelId ? document.getElementById(panelId) : null;
+
+    if (! panel) {
+        return;
     }
 
-    /**
-     * Handle dismissing alert notification banner.
-     *
-     * @param {HTMLElement} dismissBtn
-     */
-    function handleAlertDismiss(dismissBtn) {
-        const alertBox = dismissBtn.closest('[data-web-alert]');
-        if (alertBox) {
-            alertBox.remove();
-        }
+    const expanded = toggle.getAttribute('aria-expanded') !== 'true';
+
+    toggle.setAttribute('aria-expanded', String(expanded));
+    panel.hidden = ! expanded;
+}
+
+function closeNavigation(panelId, restoreFocus) {
+    const panel = document.getElementById(panelId);
+
+    if (panel) {
+        panel.hidden = true;
     }
-})(window, document);
+
+    document.querySelectorAll(`[data-web-nav-toggle][aria-controls="${CSS.escape(panelId)}"]`).forEach((toggle, index) => {
+        toggle.setAttribute('aria-expanded', 'false');
+
+        if (restoreFocus && index === 0) {
+            toggle.focus();
+        }
+    });
+}
+
+initializeDelegatedInteractions();
+mountPublicWebApp();

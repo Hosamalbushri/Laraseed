@@ -2,6 +2,7 @@
 
 namespace Webkul\Web\Seo;
 
+use Closure;
 use Webkul\Web\Contracts\SeoMetadataContract;
 
 class SeoService implements SeoMetadataContract
@@ -24,6 +25,21 @@ class SeoService implements SeoMetadataContract
      */
     protected string $siteSuffix = 'CampusHub';
 
+    /**
+     * Optional callback returning current request SEO defaults:
+     * ['site_name' => ?string, 'default_title' => ?string, 'default_description' => ?string, 'default_image' => ?string]
+     *
+     * @var (Closure(): array{site_name?: ?string, default_title?: ?string, default_description?: ?string, default_image?: ?string})|null
+     */
+    protected ?Closure $defaultsResolver = null;
+
+    public function setDefaultsResolver(?Closure $resolver): static
+    {
+        $this->defaultsResolver = $resolver;
+
+        return $this;
+    }
+
     public function setTitle(?string $title): static
     {
         $this->title = $title;
@@ -33,11 +49,22 @@ class SeoService implements SeoMetadataContract
 
     public function getTitle(): string
     {
+        $suffix = $this->resolveSiteSuffix();
+
         if (empty($this->title)) {
-            return $this->siteSuffix;
+            $defaults = $this->resolveDefaults();
+            $defaultTitle = isset($defaults['default_title']) && is_string($defaults['default_title'])
+                ? trim($defaults['default_title'])
+                : '';
+
+            if ($defaultTitle !== '' && $defaultTitle !== $suffix) {
+                return "{$defaultTitle} | {$suffix}";
+            }
+
+            return $defaultTitle !== '' ? $defaultTitle : $suffix;
         }
 
-        return "{$this->title} | {$this->siteSuffix}";
+        return "{$this->title} | {$suffix}";
     }
 
     public function setDescription(?string $description): static
@@ -49,7 +76,16 @@ class SeoService implements SeoMetadataContract
 
     public function getDescription(): ?string
     {
-        return $this->description;
+        if (! empty($this->description)) {
+            return $this->description;
+        }
+
+        $defaults = $this->resolveDefaults();
+        $defaultDescription = isset($defaults['default_description']) && is_string($defaults['default_description'])
+            ? trim($defaults['default_description'])
+            : '';
+
+        return $defaultDescription !== '' ? $defaultDescription : null;
     }
 
     public function setCanonicalUrl(?string $url): static
@@ -83,8 +119,9 @@ class SeoService implements SeoMetadataContract
         $title = htmlspecialchars($this->getTitle(), ENT_QUOTES, 'UTF-8');
         $html[] = "<title>{$title}</title>";
 
-        if (! empty($this->description)) {
-            $desc = htmlspecialchars($this->description, ENT_QUOTES, 'UTF-8');
+        $description = $this->getDescription();
+        if (! empty($description)) {
+            $desc = htmlspecialchars($description, ENT_QUOTES, 'UTF-8');
             $html[] = "<meta name=\"description\" content=\"{$desc}\">";
         }
 
@@ -93,7 +130,14 @@ class SeoService implements SeoMetadataContract
             $html[] = "<link rel=\"canonical\" href=\"{$url}\">";
         }
 
-        foreach ($this->metas as $name => $content) {
+        $metas = $this->metas;
+        $defaults = $this->resolveDefaults();
+
+        if (! isset($metas['og:image']) && ! empty($defaults['default_image']) && is_string($defaults['default_image'])) {
+            $metas['og:image'] = $defaults['default_image'];
+        }
+
+        foreach ($metas as $name => $content) {
             $n = htmlspecialchars($name, ENT_QUOTES, 'UTF-8');
             $c = htmlspecialchars($content, ENT_QUOTES, 'UTF-8');
             $attribute = str_starts_with($name, 'og:') ? 'property' : 'name';
@@ -101,5 +145,29 @@ class SeoService implements SeoMetadataContract
         }
 
         return implode("\n    ", $html);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    protected function resolveDefaults(): array
+    {
+        if ($this->defaultsResolver === null) {
+            return [];
+        }
+
+        $resolved = ($this->defaultsResolver)();
+
+        return is_array($resolved) ? $resolved : [];
+    }
+
+    protected function resolveSiteSuffix(): string
+    {
+        $defaults = $this->resolveDefaults();
+        $siteName = isset($defaults['site_name']) && is_string($defaults['site_name'])
+            ? trim($defaults['site_name'])
+            : '';
+
+        return $siteName !== '' ? $siteName : $this->siteSuffix;
     }
 }

@@ -14,6 +14,7 @@ use Webkul\Admin\Helpers\DashboardStatsRegistry;
 use Webkul\Admin\Helpers\MegaSearch;
 use Webkul\Admin\Http\Middleware\Bouncer as BouncerMiddleware;
 use Webkul\Admin\Http\Middleware\Locale;
+use Webkul\Core\Contracts\AuthenticationRedirectResolver;
 
 class AdminServiceProvider extends ServiceProvider
 {
@@ -22,6 +23,13 @@ class AdminServiceProvider extends ServiceProvider
      */
     public function boot(Router $router): void
     {
+        app(AuthenticationRedirectResolver::class)->register(
+            'admin',
+            fn (): bool => true,
+            fn (): string => route('admin.session.create'),
+            -100,
+        );
+
         $router->aliasMiddleware('user', BouncerMiddleware::class);
 
         $router->aliasMiddleware('admin_locale', Locale::class);
@@ -64,7 +72,6 @@ class AdminServiceProvider extends ServiceProvider
         $this->app->singleton(MegaSearch::class, function () {
             $megaSearch = new MegaSearch;
 
-            $megaSearch->register('students', trans('admin::app.components.layouts.header.mega-search.tabs.students'), 'admin.students.search', 20);
             $megaSearch->register('settings', trans('admin::app.components.layouts.header.mega-search.tabs.settings'), 'admin.settings.search', 30);
             $megaSearch->register('configurations', trans('admin::app.components.layouts.header.mega-search.tabs.configurations'), 'admin.configuration.search', 40);
 

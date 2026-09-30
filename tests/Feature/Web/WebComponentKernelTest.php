@@ -213,6 +213,75 @@ it('renders Accordion and Items with correct ARIA roles and progressive enhancem
         ->toContain('Answer 2');
 });
 
+it('renders Modal component with accessible ARIA dialog attributes and slots', function () {
+    $rendered = Blade::render('
+        <x-web::modal id="test-modal" title="Test Modal Title" size="lg">
+            <x-slot:trigger>
+                <x-web::button>Open</x-web::button>
+            </x-slot:trigger>
+            Modal Body Content
+            <x-slot:footer>
+                <button type="button">Cancel</button>
+            </x-slot:footer>
+        </x-web::modal>
+    ');
+
+    expect($rendered)->toContain('<v-web-modal')
+        ->toContain('id="test-modal"')
+        ->toContain('data-web-modal-trigger="test-modal"')
+        ->toContain('id="test-modal-dialog"')
+        ->toContain('role="dialog"')
+        ->toContain('aria-modal="true"')
+        ->toContain('aria-labelledby="test-modal-title"')
+        ->toContain('Test Modal Title')
+        ->toContain('data-web-modal-backdrop')
+        ->toContain('data-web-modal-close')
+        ->toContain('Modal Body Content')
+        ->toContain('Cancel');
+});
+
+it('renders Drawer component with accessible slideout structure and placement', function () {
+    $rendered = Blade::render('
+        <x-web::drawer id="test-drawer" title="Drawer Title" placement="end">
+            <x-slot:trigger>
+                <x-web::button>Open Drawer</x-web::button>
+            </x-slot:trigger>
+            Drawer Body Content
+        </x-web::drawer>
+    ');
+
+    expect($rendered)->toContain('<v-web-drawer')
+        ->toContain('id="test-drawer"')
+        ->toContain('placement="end"')
+        ->toContain('data-web-drawer-trigger="test-drawer"')
+        ->toContain('id="test-drawer-dialog"')
+        ->toContain('role="dialog"')
+        ->toContain('aria-modal="true"')
+        ->toContain('aria-labelledby="test-drawer-title"')
+        ->toContain('Drawer Title')
+        ->toContain('data-web-drawer-backdrop')
+        ->toContain('data-web-drawer-close')
+        ->toContain('Drawer Body Content');
+});
+
+it('renders Dropdown component with trigger and popover menu structure', function () {
+    $rendered = Blade::render('
+        <x-web::dropdown id="test-dropdown" align="end">
+            <x-slot:trigger>
+                <button>Trigger</button>
+            </x-slot:trigger>
+            <a href="#test">Link Item</a>
+        </x-web::dropdown>
+    ');
+
+    expect($rendered)->toContain('<v-web-dropdown')
+        ->toContain('id="test-dropdown"')
+        ->toContain('data-web-dropdown-trigger')
+        ->toContain('id="test-dropdown-menu"')
+        ->toContain('data-web-dropdown-menu')
+        ->toContain('Link Item');
+});
+
 it('ensures Web component files contain zero references to forbidden packages or Admin', function () {
     $componentPath = base_path('packages/Webkul/Web/src/Resources/views/components');
 
@@ -241,7 +310,7 @@ it('ensures Web component files contain zero references to forbidden packages or
         }
     }
 
-    expect($scannedFiles)->toBeGreaterThan(5);
+    expect($scannedFiles)->toBeGreaterThan(8);
 });
 
 it('ensures Web components perform zero database queries or business authorization checks', function () {
@@ -271,5 +340,5 @@ it('ensures Web components perform zero database queries or business authorizati
         }
     }
 
-    expect($scannedFiles)->toBeGreaterThan(5);
+    expect($scannedFiles)->toBeGreaterThan(8);
 });

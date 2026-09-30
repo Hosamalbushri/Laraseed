@@ -6,13 +6,17 @@ use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Foundation\AliasLoader;
 use Illuminate\Support\ServiceProvider;
 use Webkul\Core\Acl;
+use Webkul\Core\Auth\AuthenticationRedirectResolver;
+use Webkul\Core\Console\Commands\PackageDiagnosticsCommand;
 use Webkul\Core\Console\Commands\Version;
+use Webkul\Core\Contracts\AuthenticationRedirectResolver as AuthenticationRedirectResolverContract;
 use Webkul\Core\Core;
 use Webkul\Core\Facades\Acl as AclFacade;
 use Webkul\Core\Facades\Core as CoreFacade;
 use Webkul\Core\Facades\Menu as MenuFacade;
 use Webkul\Core\Facades\SystemConfig as SystemConfigFacade;
 use Webkul\Core\Menu;
+use Webkul\Core\Packages\OptionalPackageComposition;
 use Webkul\Core\SystemConfig;
 
 class CoreServiceProvider extends ServiceProvider
@@ -49,6 +53,16 @@ class CoreServiceProvider extends ServiceProvider
         $this->registerCommands();
 
         $this->registerFacades();
+
+        $this->app->singleton(
+            AuthenticationRedirectResolverContract::class,
+            AuthenticationRedirectResolver::class,
+        );
+
+        $this->app->singleton(OptionalPackageComposition::class, fn ($app) => new OptionalPackageComposition(
+            $app['config']->get('campushub.optional_packages.catalog', []),
+            $app['config']->get('campushub.optional_packages.enabled', []),
+        ));
     }
 
     /**
@@ -85,6 +99,7 @@ class CoreServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 Version::class,
+                PackageDiagnosticsCommand::class,
             ]);
         }
     }

@@ -1,0 +1,23 @@
+{
+    "name": "krayin/laravel-datagrid",
+    "description": "CampusHub generic DataGrid infrastructure",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "krayin/laravel-core": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Webkul\\DataGrid\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Webkul\\DataGrid\\Providers\\DataGridServiceProvider"
+            ],
+            "aliases": {}
+        }
+    },
+    "minimum-stability": "dev"
+}

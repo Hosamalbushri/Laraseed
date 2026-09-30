@@ -6,7 +6,6 @@ use Webkul\Web\Navigation\NavigationRegistry;
 beforeEach(function () {
     $this->registry = new NavigationRegistry;
 });
-
 it('registers and resolves navigation items for supported locations', function () {
     $this->registry->register([
         'id' => 'home',
@@ -160,4 +159,77 @@ it('respects conditional visibility for navigation items', function () {
 
     expect($items)->toHaveCount(1);
     expect($items->first()->id)->toBe('visible_item');
+});
+
+it('neutralizes unsafe executable URL schemes at registration time', function () {
+    foreach ([
+        'javascript:alert(1)',
+        'JAVASCRIPT:alert(document.cookie)',
+        'data:text/html,<script>alert(1)</script>',
+        'vbscript:msgbox(1)',
+        'file:///etc/passwd',
+    ] as $index => $unsafeUrl) {
+        $this->registry->register([
+            'id' => "unsafe_{$index}",
+            'title' => "Unsafe {$index}",
+            'url' => $unsafeUrl,
+            'location' => 'header',
+        ]);
+    }
+
+    $items = $this->registry->getItems('header');
+
+    foreach ($items as $item) {
+        expect($item->url)->toBe('#');
+    }
+});
+
+it('resolves active navigation state accurately across root, section prefixes, and route patterns', function () {
+    $this->registry->register([
+        'id' => 'nav_home',
+        'title' => 'Home',
+        'url' => '/',
+        'location' => 'header',
+        'order' => 10,
+    ]);
+
+    $this->registry->register([
+        'id' => 'nav_directory',
+        'title' => 'Directory',
+        'url' => '/directory',
+        'location' => 'header',
+        'order' => 20,
+    ]);
+
+    $this->registry->register([
+        'id' => 'nav_custom_pattern',
+        'title' => 'Catalog',
+        'url' => '/catalog',
+        'location' => 'header',
+        'order' => 30,
+        'attributes' => [
+            'active_patterns' => ['catalog', 'items/*'],
+        ],
+    ]);
+
+    $items = $this->registry->getItems('header')->keyBy('id');
+
+    $rootRequest = \Illuminate\Http\Request::create('/', 'GET');
+    expect($items['nav_home']->isActive($rootRequest))->toBeTrue()
+        ->and($items['nav_directory']->isActive($rootRequest))->toBeFalse()
+        ->and($items['nav_custom_pattern']->isActive($rootRequest))->toBeFalse();
+
+    $dirIndexRequest = \Illuminate\Http\Request::create('/directory', 'GET');
+    expect($items['nav_home']->isActive($dirIndexRequest))->toBeFalse()
+        ->and($items['nav_directory']->isActive($dirIndexRequest))->toBeTrue();
+
+    $dirChildRequest = \Illuminate\Http\Request::create('/directory/entry-42', 'GET');
+    expect($items['nav_home']->isActive($dirChildRequest))->toBeFalse()
+        ->and($items['nav_directory']->isActive($dirChildRequest))->toBeTrue();
+
+    $dirSiblingCollisionRequest = \Illuminate\Http\Request::create('/directory-other', 'GET');
+    expect($items['nav_directory']->isActive($dirSiblingCollisionRequest))->toBeFalse();
+
+    $patternRequest = \Illuminate\Http\Request::create('/items/REF-100', 'GET');
+    expect($items['nav_custom_pattern']->isActive($patternRequest))->toBeTrue();
 });

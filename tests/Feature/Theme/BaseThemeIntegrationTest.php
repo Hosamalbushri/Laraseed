@@ -25,7 +25,7 @@ beforeEach(function () {
             ->setMeta('og:type', 'website');
 
         return view('web::home.index', [
-            'sections' => $sections->getSections('home'),
+            'sections' => collect(),
         ]);
     })->middleware(['web', 'web_context']);
 

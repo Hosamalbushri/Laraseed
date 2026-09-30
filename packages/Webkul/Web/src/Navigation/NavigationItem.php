@@ -3,6 +3,7 @@
 namespace Webkul\Web\Navigation;
 
 use Closure;
+use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
 class NavigationItem
@@ -39,6 +40,50 @@ class NavigationItem
         }
 
         return (bool) $this->visible;
+    }
+
+    /**
+     * Determine if this navigation item is active for the given or current request.
+     */
+    public function isActive(?Request $request = null): bool
+    {
+        $request ??= app()->bound('request') ? app('request') : null;
+
+        if (! $request instanceof Request) {
+            return false;
+        }
+
+        $activeRoutes = $this->attributes['active_routes'] ?? $this->attributes['route'] ?? null;
+        if (! empty($activeRoutes) && $request->routeIs(...(array) $activeRoutes)) {
+            return true;
+        }
+
+        $activePatterns = $this->attributes['active_patterns'] ?? null;
+        if (! empty($activePatterns) && $request->is(...(array) $activePatterns)) {
+            return true;
+        }
+
+        $url = trim($this->url);
+        if ($url === '' || str_starts_with($url, '#')) {
+            return false;
+        }
+
+        $urlHost = parse_url($url, PHP_URL_HOST);
+        if (is_string($urlHost) && $urlHost !== '' && strcasecmp($urlHost, $request->getHost()) !== 0) {
+            $localHosts = ['localhost', '127.0.0.1'];
+            if (! in_array(strtolower($urlHost), $localHosts, true) || ! in_array(strtolower($request->getHost()), $localHosts, true)) {
+                return false;
+            }
+        }
+
+        $itemPath = trim((string) parse_url($url, PHP_URL_PATH), '/');
+        $currentPath = trim($request->path(), '/');
+
+        if ($itemPath === '') {
+            return $currentPath === '';
+        }
+
+        return $currentPath === $itemPath || str_starts_with($currentPath, $itemPath.'/');
     }
 
     /**

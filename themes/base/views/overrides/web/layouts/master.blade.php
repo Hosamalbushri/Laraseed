@@ -8,54 +8,64 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="light">
     {!! $seoMetadata->renderHeadHtml() !!}
+    @if (! empty($webFaviconUrl))
+        <link rel="icon" href="{{ $webFaviconUrl }}">
+    @endif
     @vite('assets/css/theme.css', 'themes/base/build')
     @stack('styles')
 </head>
 <body class="web-document">
     <a class="web-skip-link" href="#web-main">{{ trans('web::app.accessibility.skip_to_content') }}</a>
 
-    <div class="web-shell">
-        @php($headerItems = $navigation->getItems('header'))
-        @php($secondaryItems = $navigation->getItems('secondary'))
-        @php($mobileItems = $navigation->getItems('mobile'))
-
+    <div id="app" class="web-shell">
         <header class="web-site-header">
-            <div class="web-container web-site-header__inner">
-                @hasSection('header')
-                    <div class="web-site-header__content">@yield('header')</div>
-                @endif
+            @hasSection('header')
+                @yield('header')
+            @else
+                @php($headerItems = $navigation->getItems('header'))
+                @php($secondaryItems = $navigation->getItems('secondary'))
+                @php($mobileItems = $navigation->getItems('mobile'))
 
-                @if ($headerItems->isNotEmpty())
-                    <nav class="web-navigation web-navigation--header" aria-label="{{ trans('web::app.navigation.primary') }}">
-                        <ul class="web-navigation__list">
-                            @foreach ($headerItems as $item)
-                                <li class="web-navigation__item">
-                                    <a class="web-navigation__link" href="{{ $item->url }}" @if ($item->target) target="{{ $item->target }}" @endif @if ($item->target === '_blank') rel="noopener noreferrer" @endif>{{ $navigationLabels->resolve($item->title) }}</a>
-                                </li>
+                <div class="web-container web-site-header__inner">
+                    <div class="web-site-header__brand">
+                        <a class="web-site-header__brand-link" href="{{ route('web.home', [], false) }}">{{ config('app.name', 'CampusHub') }}</a>
+                    </div>
+
+                    @if ($headerItems->isNotEmpty())
+                        <nav class="web-navigation web-navigation--header" aria-label="{{ trans('web::app.navigation.primary') }}">
+                            <ul class="web-navigation__list">
+                                @foreach ($headerItems as $item)
+                                    @php($isActive = $item->isActive(request()))
+                                    <li class="web-navigation__item">
+                                        <a class="web-navigation__link{{ $isActive ? ' is-active' : '' }}" href="{{ $item->url }}" @if ($item->target) target="{{ $item->target }}" @endif @if ($item->target === '_blank') rel="noopener noreferrer" @endif @if ($isActive) aria-current="page" @endif>{{ $navigationLabels->resolve($item->title) }}</a>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </nav>
+                    @endif
+
+                    @if ($mobileItems->isNotEmpty())
+                        <nav class="web-navigation web-navigation--mobile" aria-label="{{ trans('web::app.navigation.mobile') }}">
+                            <ul class="web-navigation__list">
+                                @foreach ($mobileItems as $item)
+                                    @php($isActive = $item->isActive(request()))
+                                    <li class="web-navigation__item"><a class="web-navigation__link{{ $isActive ? ' is-active' : '' }}" href="{{ $item->url }}" @if ($isActive) aria-current="page" @endif>{{ $navigationLabels->resolve($item->title) }}</a></li>
+                                @endforeach
+                            </ul>
+                        </nav>
+                    @endif
+                </div>
+
+                @if ($secondaryItems->isNotEmpty())
+                    <nav class="web-navigation web-navigation--secondary" aria-label="{{ trans('web::app.navigation.secondary') }}">
+                        <ul class="web-container web-navigation__list">
+                            @foreach ($secondaryItems as $item)
+                                @php($isActive = $item->isActive(request()))
+                                <li class="web-navigation__item"><a class="web-navigation__link{{ $isActive ? ' is-active' : '' }}" href="{{ $item->url }}" @if ($isActive) aria-current="page" @endif>{{ $navigationLabels->resolve($item->title) }}</a></li>
                             @endforeach
                         </ul>
                     </nav>
                 @endif
-
-                @if ($mobileItems->isNotEmpty())
-                    <nav class="web-navigation web-navigation--mobile" aria-label="{{ trans('web::app.navigation.mobile') }}">
-                        <ul class="web-navigation__list">
-                            @foreach ($mobileItems as $item)
-                                <li class="web-navigation__item"><a class="web-navigation__link" href="{{ $item->url }}">{{ $navigationLabels->resolve($item->title) }}</a></li>
-                            @endforeach
-                        </ul>
-                    </nav>
-                @endif
-            </div>
-
-            @if ($secondaryItems->isNotEmpty())
-                <nav class="web-navigation web-navigation--secondary" aria-label="{{ trans('web::app.navigation.secondary') }}">
-                    <ul class="web-container web-navigation__list">
-                        @foreach ($secondaryItems as $item)
-                            <li class="web-navigation__item"><a class="web-navigation__link" href="{{ $item->url }}">{{ $navigationLabels->resolve($item->title) }}</a></li>
-                        @endforeach
-                    </ul>
-                </nav>
             @endif
         </header>
 
@@ -63,23 +73,28 @@
             @yield('content')
         </main>
 
-        @php($footerItems = $navigation->getItems('footer'))
         <footer class="web-site-footer">
-            <div class="web-container web-site-footer__inner">
-                @hasSection('footer')
-                    <div class="web-site-footer__content">@yield('footer')</div>
-                @endif
+            @hasSection('footer')
+                @yield('footer')
+            @else
+                @php($footerItems = $navigation->getItems('footer'))
+                <div class="web-container web-site-footer__inner">
+                    <div class="web-site-footer__content">
+                        <p class="web-site-footer__copyright">&copy; {{ date('Y') }} {{ config('app.name', 'CampusHub') }}. {{ trans('web::app.footer.copyright') }}</p>
+                    </div>
 
-                @if ($footerItems->isNotEmpty())
-                    <nav class="web-navigation web-navigation--footer" aria-label="{{ trans('web::app.navigation.footer') }}">
-                        <ul class="web-navigation__list">
-                            @foreach ($footerItems as $item)
-                                <li class="web-navigation__item"><a class="web-navigation__link" href="{{ $item->url }}">{{ $navigationLabels->resolve($item->title) }}</a></li>
-                            @endforeach
-                        </ul>
-                    </nav>
-                @endif
-            </div>
+                    @if ($footerItems->isNotEmpty())
+                        <nav class="web-navigation web-navigation--footer" aria-label="{{ trans('web::app.navigation.footer') }}">
+                            <ul class="web-navigation__list">
+                                @foreach ($footerItems as $item)
+                                    @php($isActive = $item->isActive(request()))
+                                    <li class="web-navigation__item"><a class="web-navigation__link{{ $isActive ? ' is-active' : '' }}" href="{{ $item->url }}" @if ($isActive) aria-current="page" @endif>{{ $navigationLabels->resolve($item->title) }}</a></li>
+                                @endforeach
+                            </ul>
+                        </nav>
+                    @endif
+                </div>
+            @endif
         </footer>
     </div>
 

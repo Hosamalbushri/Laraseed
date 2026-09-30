@@ -109,4 +109,12 @@ return [
             ],
         ],
     ],
+    'public' => [
+        'found_item' => 'Found Item',
+        'reference' => 'Reference',
+        'category' => 'Category',
+        'found_date' => 'Found Date',
+        'location' => 'Found Location',
+        'status_open' => 'Available for Claim',
+    ],
 ];

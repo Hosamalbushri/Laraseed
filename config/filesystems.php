@@ -42,12 +42,6 @@ return [
             'visibility' => 'public',
         ],
 
-        'lost_found_private' => [
-            'driver' => 'local',
-            'root' => storage_path('app/lost-found-private'),
-            'throw' => true,
-        ],
-
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

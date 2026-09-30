@@ -10,6 +10,9 @@
     "require": {
         "php": "^8.3",
         "guzzlehttp/guzzle": "^7.8",
+        "krayin/laravel-admin": "^1.0",
+        "krayin/laravel-core": "^1.0",
+        "krayin/laravel-datagrid": "^1.0",
         "laravel/framework": "^12.0"
     },
     "autoload": {
@@ -18,10 +21,11 @@
         }
     },
     "extra": {
-        "laravel": {
-            "providers": [
-                "Webkul\\Student\\Providers\\StudentServiceProvider"
-            ]
+        "campushub": {
+            "id": "student",
+            "type": "optional",
+            "provider": "Webkul\\Student\\Providers\\StudentServiceProvider",
+            "concord_module": null
         }
     },
     "minimum-stability": "dev"

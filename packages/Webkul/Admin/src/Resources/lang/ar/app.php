@@ -12,7 +12,6 @@ return [
         'edit' => 'تعديل',
         'view' => 'عرض',
         'delete' => 'حذف',
-        'students' => 'الطلاب',
     ],
     'users' => [
         'activate-warning' => 'حسابك لم يتم تفعيله بعد. يرجى الاتصال بالمسؤول.',
@@ -56,11 +55,11 @@ return [
             'invalid-password' => 'كلمة المرور الحالية التي أدخلتها غير صحيحة.',
             'name' => 'الاسم',
             'password' => 'كلمة المرور',
-            'profile-image' => 'صورة الملف الطالبي',
+            'profile-image' => 'صورة الملف الشخصي',
             'save-btn' => 'حفظ الحساب',
             'title' => 'حسابي',
             'update-success' => 'تم تحديث الحساب بنجاح',
-            'upload-image-info' => 'قم بتحميل صورة الملف الطالبي (110px X 110px) بتنسيق PNG أو JPG',
+            'upload-image-info' => 'قم بتحميل صورة الملف الشخصي (110px X 110px) بتنسيق PNG أو JPG',
         ],
     ],
     'components' => [
@@ -108,7 +107,7 @@ return [
                         'title' => 'المشاركون',
                         'placeholder' => 'اكتب للبحث عن المشاركين',
                         'users' => 'المستخدمون',
-                        'persons' => 'الطلاب',
+                        'persons' => 'الأشخاص',
                         'no-results' => 'لم يتم العثور على نتائج...',
                     ],
                 ],
@@ -307,9 +306,8 @@ return [
                     'tabs' => [
                         'leads' => 'طلبات التسجيل',
                         'quotes' => 'عروض الاشتراكات',
-                        'persons' => 'الطلاب',
+                        'persons' => 'الأشخاص',
                         'products' => 'الفعاليات وورش',
-                        'students' => 'الطلاب',
                         'settings' => 'الإعدادات',
                         'configurations' => 'التكوين',
                     ],
@@ -321,7 +319,6 @@ return [
                     'explore-all-matching-leads' => 'استكشاف جميع طلبات التسجيل المطابقين لـ ":query" (:count)',
                     'explore-all-matching-contacts' => 'استكشاف جميع جهات الاتصال المطابقة لـ ":query" (:count)',
                     'explore-all-matching-quotes' => 'استكشاف جميع عروض الاشتراكات المطابقة لـ ":query" (:count)',
-                    'explore-all-students' => 'استكشاف جميع الطلاب',
                     'explore-all-settings' => 'استكشاف جميع الإعدادات',
                     'explore-all-configurations' => 'استكشاف جميع التكوين',
                 ],
@@ -368,7 +365,7 @@ return [
                 'sales-person' => 'مندوب المبيعات',
                 'expired-at' => 'تاريخ الانتهاء',
                 'created-at' => 'تاريخ الإنشاء',
-                'person' => 'الطالب',
+                'person' => 'الشخص',
                 'subtotal' => 'المجموع الفرعي',
                 'discount' => 'الخصم',
                 'tax' => 'الضريبة',
@@ -464,15 +461,15 @@ return [
     'contacts' => [
         'persons' => [
             'index' => [
-                'title' => 'الطلاب',
-                'create-btn' => 'إنشاء طالب',
-                'create-success' => 'تم إنشاء الطالب بنجاح.',
-                'update-success' => 'تم تحديث الطالب بنجاح.',
-                'all-delete-success' => 'تم حذف جميع الطلاب المحددين بنجاح.',
-                'partial-delete-warning' => 'تم حذف بعض الطلاب بنجاح. لم يتم حذف الآخرين لأنهم مرتبطون بعملاء محتملين.',
-                'none-delete-warning' => 'لم يتم حذف أي من الطلاب المحددين لأنهم مرتبطون بعملاء محتملين.',
-                'no-selection' => 'لم يتم تحديد أي طلاب للحذف.',
-                'delete-failed' => 'فشل في حذف الطلاب المحددين.',
+                'title' => 'الأشخاص',
+                'create-btn' => 'إنشاء شخص',
+                'create-success' => 'تم إنشاء الشخص بنجاح.',
+                'update-success' => 'تم تحديث الشخص بنجاح.',
+                'all-delete-success' => 'تم حذف جميع الأشخاص المحددين بنجاح.',
+                'partial-delete-warning' => 'تم حذف بعض الأشخاص بنجاح. لم يتم حذف الآخرين لأنهم مرتبطون بعملاء محتملين.',
+                'none-delete-warning' => 'لم يتم حذف أي من الأشخاص المحددين لأنهم مرتبطون بعملاء محتملين.',
+                'no-selection' => 'لم يتم تحديد أي أشخاص للحذف.',
+                'delete-failed' => 'فشل في حذف الأشخاص المحددين.',
                 'datagrid' => [
                     'contact-numbers' => 'أرقام الاتصال',
                     'delete' => 'حذف',
@@ -486,7 +483,7 @@ return [
             ],
             'view' => [
                 'title' => ':name',
-                'about-person' => 'عن الطالب',
+                'about-person' => 'عن الشخص',
                 'about-organization' => 'حول المؤسسة',
                 'activities' => [
                     'index' => [
@@ -555,12 +552,12 @@ return [
                 ],
             ],
             'create' => [
-                'title' => 'إنشاء طالب',
-                'save-btn' => 'حفظ الطالب',
+                'title' => 'إنشاء شخص',
+                'save-btn' => 'حفظ الشخص',
             ],
             'edit' => [
-                'title' => 'تعديل الطالب',
-                'save-btn' => 'حفظ الطالب',
+                'title' => 'تعديل الشخص',
+                'save-btn' => 'حفظ الشخص',
             ],
         ],
         'organizations' => [
@@ -576,7 +573,7 @@ return [
                     'edit' => 'تعديل',
                     'id' => 'المعرف',
                     'name' => 'الاسم',
-                    'persons-count' => 'عدد الطلاب',
+                    'persons-count' => 'عدد الأشخاص',
                 ],
             ],
             'create' => [
@@ -804,8 +801,8 @@ return [
                 'send-email-to-participants' => 'إرسال بريد إلكتروني إلى المشاركين',
                 'add-webhook' => 'إضافة Webhook',
                 'update-lead' => 'تحديث طلب التسجيل',
-                'update-person' => 'تحديث الطالب',
-                'send-email-to-person' => 'إرسال بريد إلكتروني إلى الطالب',
+                'update-person' => 'تحديث الشخص',
+                'send-email-to-person' => 'إرسال بريد إلكتروني إلى الشخص',
                 'add-tag' => 'إضافة علامة',
                 'add-note-as-activity' => 'إضافة ملاحظة كنشاط',
                 'update-quote' => 'تحديث العرض',
@@ -915,7 +912,7 @@ return [
                 'form-title-color' => 'لون عنوان النموذج',
                 'general' => 'عام',
                 'leads' => 'العملاء المحتملون',
-                'person' => 'طالب',
+                'person' => 'شخص',
                 'save-btn' => 'حفظ نموذج الويب',
                 'submit-button-label' => 'تسمية زر الإرسال',
                 'submit-success-action' => 'إجراء نجاح الإرسال',
@@ -949,7 +946,7 @@ return [
                 'form-title-color' => 'لون عنوان النموذج',
                 'general' => 'عام',
                 'leads' => 'العملاء المحتملون',
-                'person' => 'طالب',
+                'person' => 'شخص',
                 'preview' => 'معاينة',
                 'public-url' => 'الرابط العام',
                 'redirect-to-url' => 'إعادة التوجيه إلى الرابط',
@@ -1288,7 +1285,7 @@ return [
                 'homepage' => 'أقسام الصفحة الرئيسية (عرض وتعديل)',
             ],
 
-            'section-title' => 'بوابة الطلاب',
+            'section-title' => 'الموقع العام',
             'section-info' => 'تخصيص الصفحة الرئيسية للواجهة العامة.',
 
             'index' => [
@@ -1511,7 +1508,7 @@ return [
                     'bottom-links' => 'روابط الشريط السفلي (حتى 10)',
                 ],
 
-                'product-carousel-legacy' => 'هذا النوع غير مستخدم في بوابة الطلاب (لا كتالوج منتجات). غيّر النوع أو احذف القسم.',
+                'product-carousel-legacy' => 'هذا النوع غير مستخدم في الموقع العام. غيّر النوع أو احذف القسم.',
             ],
 
             'update-success' => 'تم تحديث القسم بنجاح.',
@@ -1598,7 +1595,7 @@ return [
                     'entity-types' => [
                         'leads' => 'طلبات التسجيل',
                         'organizations' => 'الجهات',
-                        'persons' => 'الطلاب',
+                        'persons' => 'الأشخاص',
                         'products' => 'الفعاليات وورش',
                         'quotes' => 'عروض الاشتراكات',
                         'warehouses' => 'المستودعات',
@@ -1888,26 +1885,6 @@ return [
                         'badge-color' => 'لون البادج',
                         'header-middle-logo' => 'الشعار الإضافي',
                     ],
-                    'student-login' => [
-                        'title' => 'شاشة تسجيل دخول الطالب',
-                        'title-info' => 'تخصيص جميع النصوص الظاهرة في صفحة تسجيل دخول الطالب.',
-                        'field-logo-image' => 'صورة شعار شاشة الدخول',
-                        'field-primary-color' => 'اللون الأساسي',
-                        'field-accent-color' => 'لون التمييز',
-                        'field-surface-start' => 'لون الخلفية (البداية)',
-                        'field-surface-end' => 'لون الخلفية (النهاية)',
-                        'field-panel-start' => 'لون اللوحة الجانبية (البداية)',
-                        'field-panel-end' => 'لون اللوحة الجانبية (النهاية)',
-                        'field-title' => 'العنوان الرئيسي',
-                        'field-description' => 'الوصف الرئيسي',
-                        'field-eyebrow' => 'نص أعلى العنوان',
-                        'field-panel-lead' => 'وصف اللوحة الجانبية',
-                        'field-card-number' => 'اسم/Placeholder رقم البطاقة',
-                        'field-password' => 'اسم حقل كلمة المرور',
-                        'field-remember' => 'نص تذكرني',
-                        'field-submit' => 'نص زر الدخول',
-                        'field-back-portal' => 'نص العودة للرئيسية',
-                    ],
                     'navigation' => [
                         'title' => 'تنقل رأس الموقع',
                         'title-info' => 'إظهار/إخفاء التبويبات، تعديل أسمائها، وإضافة تبويبات مخصصة في هيدر الموقع.',
@@ -1946,7 +1923,6 @@ return [
                         'quotes' => 'العروض',
                         'sent' => 'المرسل',
                         'settings' => 'الإعدادات',
-                        'students' => 'الطلاب',
                         'title' => 'إعدادات عناصر القائمة',
                         'trash' => 'المحذوفات',
                     ],
@@ -1954,17 +1930,6 @@ return [
                         'brand-color' => 'لون الهوية (Brand)',
                         'info' => 'تحديد لون الهوية المستخدم في عناصر القائمة.',
                         'title' => 'إعدادات لون القائمة',
-                    ],
-                ],
-                'university-api' => [
-                    'title' => 'واجهة برمجة الجامعة',
-                    'info' => 'إعداد الرابط الذي يستقبل طلب التحقق من بيانات الطالب في نظام الجامعة.',
-
-                    'endpoint-settings' => [
-                        'title' => 'إعدادات نقطة النهاية',
-                        'info' => 'تحديد رابط نقطة التحقق الذي تُرسل إليه بيانات البطاقة الجامعية وكلمة المرور. يُتوقع أن تحتوي الاستجابة على حالة النجاح وبيانات الطالب (الاسم، الرقم الجامعي، التخصص، المستوى الدراسي).',
-                        'endpoint' => 'رابط نقطة التحقق',
-                        'endpoint-info' => 'المفاتيح المتوقعة في الاستجابة (الربط الافتراضي): success، و data.full_name للاسم، و data.student_id للرقم الجامعي، و data.major للتخصص، و data.level للمستوى الدراسي.',
                     ],
                 ],
             ],
@@ -2026,7 +1991,7 @@ return [
                 'total-leads' => 'إجمالي طلبات التسجيل',
                 'average-leads-per-day' => 'متوسط طلبات التسجيل في اليوم',
                 'total-quotations' => 'إجمالي العروض',
-                'total-persons' => 'إجمالي الطلاب',
+                'total-persons' => 'إجمالي الأشخاص',
                 'total-organizations' => 'إجمالي المؤسسات',
             ],
 
@@ -2056,9 +2021,9 @@ return [
                 'empty-info' => 'لا توجد فعاليات وورش متاحة للفترة المختارة',
             ],
             'top-persons' => [
-                'title' => 'أفضل الطلاب',
-                'empty-title' => 'لم يتم العثور على طلاب',
-                'empty-info' => 'لا توجد طلاب متاحة للفترة المختارة',
+                'title' => 'أفضل الأشخاص',
+                'empty-title' => 'لم يتم العثور على أشخاص',
+                'empty-info' => 'لا يوجد أشخاص متاحون للفترة المختارة',
             ],
             'open-leads-by-states' => [
                 'title' => 'طلبات التسجيل المفتوحين حسب المراحل',
@@ -2072,8 +2037,8 @@ return [
         'dashboard' => 'لوحة التحكم',
         'activities' => 'الأنشطة',
         'contacts' => 'جهات الاتصال',
-        'persons' => 'الطلاب',
-        'person' => 'طالب',
+        'persons' => 'الأشخاص',
+        'person' => 'شخص',
         'organizations' => 'المؤسسات',
         'organization' => 'مؤسسة',
         'products' => 'الفعاليات وورش',
@@ -2129,7 +2094,7 @@ return [
         'inventory' => 'المخزون',
         'inventory-info' => 'إدارة جميع إعدادات المخزون المتعلقة في نظام إدارة علاقات العملاء (CRM)',
         'data_transfer' => 'نقل البيانات',
-        'data_transfer_info' => 'إدارة إعدادات نقل البيانات المتعلقة بالطلاب والفعاليات وورش وطلبات التسجيل في إدارة علاقات العملاء (CRM)',
+        'data_transfer_info' => 'إدارة إعدادات نقل البيانات في إدارة علاقات العملاء (CRM)',
     ],
     'user' => [
         'account' => [
@@ -2144,7 +2109,7 @@ return [
             'account-save' => 'تم حفظ تغييرات الحساب بنجاح.',
             'permission-denied' => 'تم رفض الإذن',
             'remove-image' => 'إزالة الصورة',
-            'upload_image_pix' => 'تحميل صورة الملف الطالبي (100 بكسل × 100 بكسل)',
+            'upload_image_pix' => 'تحميل صورة الملف الشخصي (100 بكسل × 100 بكسل)',
             'upload_image_format' => 'بصيغة PNG أو JPG',
             'image_upload_message' => 'فقط الصور (.jpeg، .jpg، .png، ..) مسموح بها.',
         ],
@@ -2207,62 +2172,5 @@ return [
         'xlsx' => 'XLSX',
     ],
 
-
-    'students' => [
-        'title' => 'الطلاب',
-        'create-success' => 'تم إنشاء الطالب بنجاح.',
-        'update-success' => 'تم تحديث الطالب بنجاح.',
-        'delete-success' => 'تم حذف الطالب بنجاح.',
-        'delete-failed' => 'فشل حذف الطالب.',
-        'all-delete-success' => 'تم حذف الطلاب المحددين بنجاح.',
-        'no-selection' => 'لم يتم تحديد أي طلاب.',
-
-        'index' => [
-            'title' => 'الطلاب',
-            'create-btn' => 'إضافة طالب',
-
-            'datagrid' => [
-                'id' => 'المعرف',
-                'name' => 'الاسم',
-                'university-card-number' => 'رقم البطاقة الجامعية',
-                'registration-number' => 'الرقم الجامعي',
-                'major' => 'التخصص',
-                'academic-level' => 'المستوى الأكاديمي',
-                'created-at' => 'تاريخ الإنشاء',
-                'view' => 'عرض',
-                'edit' => 'تعديل',
-                'delete' => 'حذف',
-            ],
-        ],
-
-        'create' => [
-            'title' => 'إضافة طالب',
-            'save-btn' => 'حفظ الطالب',
-        ],
-
-        'edit' => [
-            'title' => 'تعديل الطالب',
-            'save-btn' => 'حفظ التعديلات',
-        ],
-
-        'view' => [
-            'title' => 'الطالب: :name',
-            'heading' => 'تفاصيل الطالب',
-            'edit-btn' => 'تعديل الطالب',
-            'general-info' => 'البيانات العامة',
-        ],
-
-        'form' => [
-            'name' => 'الاسم',
-            'university-card-number' => 'رقم البطاقة الجامعية',
-            'registration-number' => 'الرقم الجامعي',
-            'major' => 'التخصص',
-            'academic-level' => 'المستوى الأكاديمي',
-            'password' => 'كلمة المرور',
-            'password-confirmation' => 'تأكيد كلمة المرور',
-            'profile-image' => 'الصورة الشخصية',
-        ],
-
-    ],
 
 ];

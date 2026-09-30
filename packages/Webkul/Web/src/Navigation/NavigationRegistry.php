@@ -60,7 +60,7 @@ class NavigationRegistry implements NavigationRegistryContract
         $this->items[$location][$id] = new NavigationItem(
             id: $id,
             title: $title,
-            url: $url,
+            url: $this->sanitizeUrl($url),
             location: $location,
             order: (int) ($item['order'] ?? 100),
             parentId: isset($item['parent_id']) ? (string) $item['parent_id'] : null,
@@ -71,6 +71,26 @@ class NavigationRegistry implements NavigationRegistryContract
         );
 
         return $this;
+    }
+
+    /**
+     * Sanitize navigation URL to prevent unsafe executable schemes.
+     */
+    protected function sanitizeUrl(string $url): string
+    {
+        $trimmed = trim($url);
+
+        if ($trimmed === '') {
+            return '#';
+        }
+
+        $normalized = preg_replace('/[\x00-\x20]+/', '', $trimmed) ?? '';
+
+        if (preg_match('/^(javascript|data|vbscript|file):/i', $normalized)) {
+            return '#';
+        }
+
+        return $trimmed;
     }
 
     /**

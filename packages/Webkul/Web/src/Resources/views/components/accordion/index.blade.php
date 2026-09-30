@@ -9,11 +9,11 @@
     $classes = 'web-accordion' . ($flush ? ' web-accordion--flush' : '');
 @endphp
 
-<div
+<v-web-accordion
     id="{{ $accordionId }}"
     data-web-accordion
     data-web-accordion-always-open="{{ $alwaysOpen ? 'true' : 'false' }}"
     {{ $attributes->merge(['class' => $classes]) }}
 >
     {{ $slot }}
-</div>
+</v-web-accordion>

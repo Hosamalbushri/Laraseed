@@ -1,6 +1,5 @@
 <?php
 
-use Webkul\Student\Models\Student;
 use Webkul\User\Models\User;
 
 return [
@@ -44,10 +43,6 @@ return [
             'provider' => 'users',
         ],
 
-        'student' => [
-            'driver' => 'session',
-            'provider' => 'students',
-        ],
     ],
 
     /*
@@ -73,10 +68,6 @@ return [
             'model' => User::class,
         ],
 
-        'students' => [
-            'driver' => 'eloquent',
-            'model' => Student::class,
-        ],
     ],
 
     /*

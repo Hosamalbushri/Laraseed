@@ -13,9 +13,7 @@ return [
         'mobile' => 'Mobile navigation',
         'footer' => 'Footer navigation',
         'home' => 'Home',
-        'events' => 'Events',
         'lost_and_found' => 'Lost & Found',
-        'student_portal' => 'Student Portal',
         'login' => 'Sign In',
         'logout' => 'Sign Out',
     ],
@@ -28,5 +26,9 @@ return [
     ],
     'footer' => [
         'copyright' => 'All rights reserved.',
+    ],
+    'common' => [
+        'close' => 'Close',
+        'options' => 'Options',
     ],
 ];

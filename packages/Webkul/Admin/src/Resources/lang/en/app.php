@@ -12,7 +12,6 @@ return [
         'edit' => 'Edit',
         'view' => 'View',
         'delete' => 'Delete',
-        'students' => 'Students',
     ],
 
     'users' => [
@@ -350,7 +349,6 @@ return [
                         'quotes' => 'Quotes',
                         'persons' => 'Persons',
                         'products' => 'Products',
-                        'students' => 'Students',
                         'settings' => 'Settings',
                         'configurations' => 'Configurations',
                     ],
@@ -363,7 +361,6 @@ return [
                     'explore-all-matching-leads' => 'Explore all leads matching ":query" (:count)',
                     'explore-all-matching-contacts' => 'Explore all contacts matching ":query" (:count)',
                     'explore-all-matching-quotes' => 'Explore all quotes matching ":query" (:count)',
-                    'explore-all-students' => 'Explore all Students',
                     'explore-all-settings' => 'Explore all Settings',
                     'explore-all-configurations' => 'Explore all Configurations',
                 ],
@@ -1412,15 +1409,15 @@ return [
 
         'shop-theme' => [
             'acl' => [
-                'title' => 'Student portal homepage',
+                'title' => 'Public site homepage',
                 'homepage' => 'Homepage sections (list & edit)',
             ],
 
-            'section-title' => 'Student portal',
-            'section-info' => 'Customize the public student portal homepage.',
+            'section-title' => 'Public site',
+            'section-info' => 'Customize the public site homepage.',
 
             'index' => [
-                'title' => 'Student portal homepage',
+                'title' => 'Public site homepage',
                 'info' => 'Manage public homepage sections the same way Bagisto uses theme customizations: order, type, locale-specific content, and status.',
                 'create-btn' => 'Add section',
 
@@ -1454,7 +1451,7 @@ return [
                     'category-carousel' => 'Event categories carousel',
                     'footer-links' => 'Footer links (homepage block)',
                     'services-content' => 'Services / features strip',
-                    'immersive-hero' => 'Immersive hero (Student Sphere style)',
+                    'immersive-hero' => 'Immersive hero',
                     'portal-footer' => 'Portal footer (all pages)',
                     'product-carousel-legacy' => 'Product carousel (legacy — not shown on portal)',
                 ],
@@ -1639,7 +1636,7 @@ return [
                     'bottom-links' => 'Bottom links (up to 10)',
                 ],
 
-                'product-carousel-legacy' => 'This section type is not used on the student portal (no product catalog). Change the type or delete this section.',
+                'product-carousel-legacy' => 'This section type is not used on the public site. Change the type or delete this section.',
             ],
 
             'update-success' => 'Homepage section updated successfully.',
@@ -2040,26 +2037,6 @@ return [
                         'badge-color' => 'Badge color',
                         'header-middle-logo' => 'Additional logo',
                     ],
-                    'student-login' => [
-                        'title' => 'Student Login Screen',
-                        'title-info' => 'Customize all visible texts on the student login page.',
-                        'field-logo-image' => 'Login logo image',
-                        'field-primary-color' => 'Primary color',
-                        'field-accent-color' => 'Accent color',
-                        'field-surface-start' => 'Background color (start)',
-                        'field-surface-end' => 'Background color (end)',
-                        'field-panel-start' => 'Left panel color (start)',
-                        'field-panel-end' => 'Left panel color (end)',
-                        'field-title' => 'Main title',
-                        'field-description' => 'Main description',
-                        'field-eyebrow' => 'Eyebrow label',
-                        'field-panel-lead' => 'Side panel description',
-                        'field-card-number' => 'Card number label / placeholder',
-                        'field-password' => 'Password label',
-                        'field-remember' => 'Remember me label',
-                        'field-submit' => 'Submit button text',
-                        'field-back-portal' => 'Back to home text',
-                    ],
                     'navigation' => [
                         'title' => 'Site header navigation',
                         'title-info' => 'Show/hide tabs, rename them, and add custom tabs for the site header.',
@@ -2101,7 +2078,6 @@ return [
                         'quotes' => 'Quotes',
                         'sent' => 'Sent',
                         'settings' => 'Settings',
-                        'students' => 'Students',
                         'title' => 'Menu Item Configurations',
                         'trash' => 'Trash',
                     ],
@@ -2113,17 +2089,6 @@ return [
                     ],
                 ],
 
-                'university-api' => [
-                    'title' => 'University API',
-                    'info' => 'Configure the endpoint used to verify student credentials against the university system.',
-
-                    'endpoint-settings' => [
-                        'title' => 'Endpoint settings',
-                        'info' => 'Set the university verification URL that receives student card and password. The API response is expected to include success + profile fields (name, registration number, major, academic level).',
-                        'endpoint' => 'Verification endpoint URL',
-                        'endpoint-info' => 'Expected response keys (default mapping): success, data.full_name (name), data.student_id (registration number), data.major (major), data.level (academic level).',
-                    ],
-                ],
             ],
 
             'email' => [
@@ -2393,63 +2358,6 @@ return [
         'xlsx' => 'XLSX',
     ],
 
-
-    'students' => [
-        'title' => 'Students',
-        'create-success' => 'Student created successfully.',
-        'update-success' => 'Student updated successfully.',
-        'delete-success' => 'Student deleted successfully.',
-        'delete-failed' => 'Student deletion failed.',
-        'all-delete-success' => 'Selected students deleted successfully.',
-        'no-selection' => 'No students were selected.',
-
-        'index' => [
-            'title' => 'Students',
-            'create-btn' => 'Add Student',
-
-            'datagrid' => [
-                'id' => 'ID',
-                'name' => 'Name',
-                'university-card-number' => 'University Card Number',
-                'registration-number' => 'Registration Number',
-                'major' => 'Major',
-                'academic-level' => 'Academic Level',
-                'created-at' => 'Created At',
-                'view' => 'View',
-                'edit' => 'Edit',
-                'delete' => 'Delete',
-            ],
-        ],
-
-        'create' => [
-            'title' => 'Add Student',
-            'save-btn' => 'Save Student',
-        ],
-
-        'edit' => [
-            'title' => 'Edit Student',
-            'save-btn' => 'Save Changes',
-        ],
-
-        'view' => [
-            'title' => 'Student: :name',
-            'heading' => 'Student Details',
-            'edit-btn' => 'Edit Student',
-            'general-info' => 'General Information',
-        ],
-
-        'form' => [
-            'name' => 'Name',
-            'university-card-number' => 'University Card Number',
-            'registration-number' => 'Registration Number',
-            'major' => 'Major',
-            'academic-level' => 'Academic Level',
-            'password' => 'Password',
-            'password-confirmation' => 'Password Confirmation',
-            'profile-image' => 'Profile Image',
-        ],
-
-    ],
 
     'emails' => [
         'common' => [

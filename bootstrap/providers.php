@@ -6,13 +6,12 @@ use Prettus\Repository\Providers\RepositoryServiceProvider;
 use Webkul\Admin\Providers\AdminServiceProvider;
 use Webkul\Core\Providers\CoreServiceProvider;
 use Webkul\DataGrid\Providers\DataGridServiceProvider;
-use Webkul\Event\Providers\EventServiceProvider;
 use Webkul\Installer\Providers\InstallerServiceProvider;
-use Webkul\LostAndFound\Providers\LostAndFoundServiceProvider;
-use Webkul\Student\Providers\StudentServiceProvider;
 use Webkul\Theme\Providers\ThemeServiceProvider;
 use Webkul\User\Providers\UserServiceProvider;
 use Webkul\Web\Providers\WebServiceProvider;
+
+$optionalProviders = config('campushub.optional_packages.providers', []);
 
 return [
     /*
@@ -34,9 +33,7 @@ return [
     DataGridServiceProvider::class,
     InstallerServiceProvider::class,
     UserServiceProvider::class,
-    EventServiceProvider::class,
-    StudentServiceProvider::class,
-    LostAndFoundServiceProvider::class,
+    ...$optionalProviders,
     ThemeServiceProvider::class,
     WebServiceProvider::class,
 ];

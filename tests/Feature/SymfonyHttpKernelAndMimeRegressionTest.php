@@ -26,9 +26,9 @@ it('rejects unauthenticated requests to protected admin routes with a redirect t
         ->assertRedirect(route('admin.session.create'));
 });
 
-it('rejects unauthenticated requests to protected student routes with a redirect to student login', function () {
-    $this->post(route('student.lost_found.reports.store'), [])
-        ->assertRedirect(route('student.login'));
+it('rejects unauthenticated requests to protected admin settings routes with a redirect to admin login', function () {
+    $this->get(route('admin.settings.index'))
+        ->assertRedirect(route('admin.session.create'));
 });
 
 it('properly constructs and validates email addresses preventing CRLF injection in Symfony Mime', function () {

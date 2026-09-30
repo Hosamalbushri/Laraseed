@@ -26,10 +26,17 @@ it('assigns the generic root to exactly one Web Foundation route', function () {
 it('serves the public root to an unauthenticated English guest through Base', function () {
     $response = $this->withSession(['web_locale' => 'en'])->get('/');
 
+    $isWebsiteEnabled = in_array('website', config('campushub.optional_packages.enabled', []), true);
+
     $response->assertOk()
         ->assertSee('<html lang="en" dir="ltr" data-theme="base">', false)
-        ->assertSee('web-home__empty', false)
         ->assertDontSee('student-login', false);
+
+    if ($isWebsiteEnabled) {
+        $response->assertSee('website-hero', false);
+    } else {
+        $response->assertSee('web-home__empty', false);
+    }
 
     expect(app(WebContextContract::class)->locale())->toBe('en')
         ->and(app(WebContextContract::class)->direction())->toBe('ltr')
@@ -39,22 +46,20 @@ it('serves the public root to an unauthenticated English guest through Base', fu
 it('serves the public root in Arabic RTL through the same Base Theme', function () {
     $response = $this->withSession(['web_locale' => 'ar'])->get('/');
 
+    $isWebsiteEnabled = in_array('website', config('campushub.optional_packages.enabled', []), true);
+
     $response->assertOk()
-        ->assertSee('<html lang="ar" dir="rtl" data-theme="base">', false)
-        ->assertSee('web-home__empty', false);
+        ->assertSee('<html lang="ar" dir="rtl" data-theme="base">', false);
+
+    if ($isWebsiteEnabled) {
+        $response->assertSee('website-hero', false);
+    } else {
+        $response->assertSee('web-home__empty', false);
+    }
 
     expect(app(WebContextContract::class)->locale())->toBe('ar')
         ->and(app(WebContextContract::class)->direction())->toBe('rtl')
         ->and(app(WebContextContract::class)->activeTheme())->toBe('base');
-});
-
-it('keeps Student login separate and Student protected routes authenticated', function () {
-    expect(route('student.login', absolute: false))->toBe('/student/login');
-
-    $this->get(route('student.login'))->assertOk();
-
-    $this->post(route('student.lost_found.reports.store'), [])
-        ->assertRedirect(route('student.login'));
 });
 
 it('keeps the Web root source independent from optional packages and themes', function () {

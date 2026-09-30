@@ -5,6 +5,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
+use Webkul\Core\Contracts\AuthenticationRedirectResolver;
 use Webkul\Installer\Http\Middleware\CanInstall;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -16,9 +17,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->redirectGuestsTo(fn (Request $request) => $request->is('student/*')
-            ? route('student.login')
-            : route('admin.session.create'));
+        $middleware->redirectGuestsTo(
+            fn (Request $request) => app(AuthenticationRedirectResolver::class)->resolve($request)
+        );
 
         $middleware->append(CanInstall::class);
 

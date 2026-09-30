@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use LogicException;
 use Webkul\Admin\Helpers\MegaSearch;
+use Webkul\Core\Contracts\AuthenticationRedirectResolver;
 use Webkul\Core\ViewRenderEventManager;
 use Webkul\Student\Services\Contracts\UniversityStudentApiContract;
 use Webkul\Student\Services\FakeUniversityStudentApiClient;
@@ -24,6 +25,8 @@ class StudentServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->registerAuthentication();
+
         $this->app->singleton(StudentAdminService::class);
 
         $this->registerConfig();
@@ -48,6 +51,13 @@ class StudentServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        app(AuthenticationRedirectResolver::class)->register(
+            'student',
+            fn (Request $request): bool => $request->is('student/*'),
+            fn (): string => route('student.login'),
+            100,
+        );
+
         RateLimiter::for('student-login', function (Request $request) {
             return Limit::perMinute(5)->by(
                 sha1($request->ip().'|'.(string) $request->input('university_card_number'))
@@ -98,6 +108,22 @@ class StudentServiceProvider extends ServiceProvider
         );
 
         $this->registerCoreConfigContributions();
+    }
+
+    protected function registerAuthentication(): void
+    {
+        $authentication = require dirname(__DIR__).'/Config/auth.php';
+
+        config([
+            'auth.guards' => [
+                ...config('auth.guards', []),
+                ...$authentication['guards'],
+            ],
+            'auth.providers' => [
+                ...config('auth.providers', []),
+                ...$authentication['providers'],
+            ],
+        ]);
     }
 
     protected function registerCoreConfigContributions(): void

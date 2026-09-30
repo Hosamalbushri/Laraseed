@@ -8,17 +8,24 @@
             "email": "example@webkul.com"
         }
     ],
-    "require": {},
+    "require": {
+        "krayin/laravel-admin": "^1.0",
+        "krayin/laravel-core": "^1.0",
+        "krayin/laravel-datagrid": "^1.0",
+        "krayin/laravel-user": "^1.0",
+        "webkul/student": "dev-main"
+    },
     "autoload": {
         "psr-4": {
             "Webkul\\LostAndFound\\": "src/"
         }
     },
     "extra": {
-        "laravel": {
-            "providers": [
-                "Webkul\\LostAndFound\\Providers\\LostAndFoundServiceProvider"
-            ]
+        "campushub": {
+            "id": "lost_and_found",
+            "type": "optional",
+            "provider": "Webkul\\LostAndFound\\Providers\\LostAndFoundServiceProvider",
+            "concord_module": "Webkul\\LostAndFound\\Providers\\ModuleServiceProvider"
         }
     },
     "minimum-stability": "dev"

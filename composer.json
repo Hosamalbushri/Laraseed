@@ -61,11 +61,11 @@
             "Webkul\\DataGrid\\": "packages/Webkul/DataGrid/src",
             "Webkul\\Installer\\": "packages/Webkul/Installer/src",
             "Webkul\\User\\": "packages/Webkul/User/src",
-            "Webkul\\Event\\": "packages/Webkul/Event/src",
             "Webkul\\Student\\": "packages/Webkul/Student/src",
             "Webkul\\LostAndFound\\": "packages/Webkul/LostAndFound/src",
             "Webkul\\Web\\": "packages/Webkul/Web/src",
-            "Webkul\\Theme\\": "packages/Webkul/Theme/src"
+            "Webkul\\Theme\\": "packages/Webkul/Theme/src",
+            "Webkul\\Website\\": "packages/Webkul/Website/src"
         }
     },
     "autoload-dev": {

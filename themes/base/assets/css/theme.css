@@ -1,3 +1,5 @@
+@tailwind base;
+
 :root {
     color-scheme: light;
     --color-background: #f7f8fa;
@@ -58,6 +60,8 @@
     --motion-normal: 180ms;
     --content-width: 72rem;
 }
+
+@tailwind components;
 
 *,
 *::before,
@@ -164,10 +168,30 @@ a:hover {
     gap: var(--space-5);
 }
 
+.web-site-header__brand-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--color-foreground);
+    font-size: var(--font-size-lg);
+    font-weight: 750;
+    text-decoration: none;
+}
+
+.web-site-header__brand-link:hover {
+    color: var(--color-primary-hover);
+}
+
 .web-site-footer {
     margin-block-start: var(--space-12);
     border-block-start: 1px solid var(--color-border);
     background: var(--color-muted);
+    color: var(--color-muted-foreground);
+}
+
+.web-site-footer__copyright {
+    margin: 0;
+    font-size: var(--font-size-xs);
     color: var(--color-muted-foreground);
 }
 
@@ -190,12 +214,20 @@ a:hover {
     font-size: var(--font-size-sm);
     font-weight: 650;
     text-decoration: none;
-    transition: background-color var(--motion-fast) ease, color var(--motion-fast) ease;
+    transition: background-color var(--motion-fast) ease, color var(--motion-fast) ease, box-shadow var(--motion-fast) ease;
 }
 
 .web-navigation__link:hover {
     background: var(--color-muted);
     color: var(--color-primary-hover);
+}
+
+.web-navigation__link.is-active,
+.web-navigation__link[aria-current="page"] {
+    background: var(--color-info-surface);
+    color: var(--color-primary-hover);
+    font-weight: 750;
+    box-shadow: inset 0 -2px 0 0 var(--color-primary);
 }
 
 .web-navigation--secondary {
@@ -589,6 +621,7 @@ a:hover {
 }
 
 .web-accordion {
+    display: block;
     overflow: clip;
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
@@ -722,3 +755,5 @@ a:hover {
         animation-iteration-count: 1 !important;
     }
 }
+
+@tailwind utilities;

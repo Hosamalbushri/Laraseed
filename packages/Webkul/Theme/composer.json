@@ -2,6 +2,7 @@
     "name": "webkul/theme",
     "type": "library",
     "description": "CampusHub Theme Engine Presentation Foundation",
+    "license": "MIT",
     "authors": [
         {
             "name": "Webkul",

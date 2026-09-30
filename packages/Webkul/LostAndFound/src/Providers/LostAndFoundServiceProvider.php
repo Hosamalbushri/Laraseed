@@ -12,6 +12,11 @@ class LostAndFoundServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->registerConfig();
+
+        $this->app->singleton(
+            \Webkul\LostAndFound\Contracts\PublicLostAndFoundReadContract::class,
+            \Webkul\LostAndFound\Services\PublicLostAndFoundService::class,
+        );
     }
 
     /**
@@ -34,6 +39,11 @@ class LostAndFoundServiceProvider extends ServiceProvider
      */
     protected function registerConfig(): void
     {
+        $this->mergeConfigFrom(
+            __DIR__.'/../Config/filesystems.php',
+            'filesystems.disks',
+        );
+
         $this->mergeConfigFrom(
             __DIR__.'/../Config/acl.php',
             'acl',

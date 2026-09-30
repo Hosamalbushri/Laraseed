@@ -4,10 +4,6 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use Webkul\Event\Models\Event;
-use Webkul\Student\DataTransferObjects\StudentProfileDto;
-use Webkul\Student\Models\Student;
-use Webkul\Student\Services\Contracts\UniversityStudentApiContract;
 use Webkul\User\Models\Role;
 use Webkul\User\Models\User;
 
@@ -32,15 +28,6 @@ function runtimeAuditUser(array $permissions): User
     ]);
 }
 
-it('redirects a student guest to the student login', function () {
-    $this->post(route('student.lost_found.reports.store'), [])
-        ->assertRedirect(route('student.login'));
-});
-
-it('returns JSON 401 for an unauthenticated student API-style request', function () {
-    $this->postJson(route('student.lost_found.reports.store'), [])
-        ->assertUnauthorized();
-});
 
 it('keeps admin guest authentication on the admin login', function () {
     $this->get(route('admin.dashboard.index'))
@@ -81,43 +68,11 @@ it('rejects a disabled administrator after valid credentials', function () {
     $this->assertGuest('user');
 });
 
-it('uses the university API only for first student login then retains local authentication', function () {
-    $card = 'AUDIT-'.uniqid();
-    $api = Mockery::mock(UniversityStudentApiContract::class);
-    $api->shouldReceive('verifyAndFetchProfile')
-        ->once()
-        ->with($card, 'first-password')
-        ->andReturn(new StudentProfileDto('Audit Student', $card, 'Audit Major', '4'));
-    app()->instance(UniversityStudentApiContract::class, $api);
-
-    $this->post(route('student.login.store'), [
-        'university_card_number' => $card,
-        'password' => 'first-password',
-    ])->assertRedirect('/');
-
-    $student = Student::where('university_card_number', $card)->firstOrFail();
-    expect(Hash::check('first-password', $student->password))->toBeTrue();
-    auth()->guard('student')->logout();
-
-    $unusedApi = Mockery::mock(UniversityStudentApiContract::class);
-    $unusedApi->shouldNotReceive('verifyAndFetchProfile');
-    app()->instance(UniversityStudentApiContract::class, $unusedApi);
-
-    $this->post(route('student.login.store'), [
-        'university_card_number' => $card,
-        'password' => 'first-password',
-    ])->assertRedirect('/');
-
-    $this->assertAuthenticatedAs($student, 'student');
-});
-
-it('boots student login and core admin pages', function () {
-    $this->get(route('student.login'))->assertOk();
-
+it('boots core admin pages', function () {
     $this->actingAs(getDefaultAdmin(), 'user')
-        ->get(route('admin.events.index'))
+        ->get(route('admin.dashboard.index'))
         ->assertOk();
-    $this->get(route('admin.events.categories.index'))->assertOk();
+    $this->get(route('admin.settings.users.index'))->assertOk();
 });
 
 it('does not expose the installer after an installation marker exists', function () {

@@ -15,7 +15,12 @@ use Webkul\User\Models\User;
 |
  */
 
-uses(TestCase::class)->in('Feature');
+uses(TestCase::class)->in(
+    'Feature',
+    '../packages/Webkul/Student/tests',
+    '../packages/Webkul/LostAndFound/tests',
+    '../packages/Webkul/Website/tests',
+);
 
 /*
 |--------------------------------------------------------------------------

@@ -66,11 +66,9 @@ class Handler extends ExceptionHandler
             return response()->json(['message' => $this->jsonErrorMessages[401]], 401);
         }
 
-        if (in_array('student', $exception->guards(), true)) {
-            return redirect()->guest(route('student.login'));
-        }
-
-        return redirect()->guest(route('admin.session.create'));
+        return redirect()->guest(
+            $exception->redirectTo($request) ?? route('admin.session.create')
+        );
     }
 
     /**

@@ -19,4 +19,10 @@ return [
     'deactivate' => 'تعطيل',
     'make-primary' => 'تعيين كأساسية',
     'cannot-deactivate-primary' => 'لا يمكن تعطيل لغة المحتوى الأساسية.',
+    'cannot-deactivate-last-active' => 'لا يمكن تعطيل آخر لغة محتوى نشطة.',
+    'ltr' => 'من اليسار إلى اليمين (LTR)',
+    'rtl' => 'من اليمين إلى اليسار (RTL)',
+    'id' => 'المعرف',
+    'status' => 'الحالة',
+    'edit' => 'تعديل اللغة',
 ];

@@ -50,10 +50,8 @@ class Menu
             throw new \Exception('Area must be provided to get menu items.');
         }
 
-        static $items;
-
-        if ($items) {
-            return $items;
+        if ($this->items) {
+            return collect($this->items)->sortBy(fn ($item) => $item->getPosition());
         }
 
         $configMenu = collect(config("menu.$area"))->map(function ($item) {

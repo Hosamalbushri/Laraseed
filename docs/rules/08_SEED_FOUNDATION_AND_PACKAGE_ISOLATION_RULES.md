@@ -1,6 +1,6 @@
-# CampusHub Seed Foundation and Package Isolation Rules
+# Laraseed Seed Foundation and Package Isolation Rules
 
-> **Mandatory dependency-boundary standard.** CampusHub is a reusable seed. Foundation must remain useful without optional feature packages, and optional packages must compose onto Foundation without depositing feature behavior in it.
+> **Mandatory dependency-boundary standard.** Laraseed is a reusable seed. Foundation must remain useful without optional feature packages, and optional packages must compose onto Foundation without depositing feature behavior in it.
 
 ## 1. Package classification
 
@@ -150,7 +150,7 @@ Two test modes are permanent requirements: Foundation-only default certification
 - **PKG-SC-02 (Test Suite Locality):** Every Optional Package must physically own its feature-specific tests in its own directory (`packages/Webkul/<Package>/tests`). Feature and Unit tests specific to an Optional Package must never be stranded in central root `tests/`.
 - **PKG-SC-03 (Resource Locality):** Optional packages must own their migrations, routes, ACL, menu, translations, views, DataGrids, configuration definitions, test fixtures, and development mocks.
 - **PKG-SC-04 (Foundation Source Purity):** Foundation packages (`Core`, `Admin`, `User`, `DataGrid`, `Installer`, `Web`, `Theme`) must NEVER import Optional Package production classes or assume their existence.
-- **PKG-SC-05 (Explicit Dependency Declaration):** An Optional Package must not depend on another Optional Package unless explicitly declared in package composition metadata (`extra.campushub.requires` in `composer.json`).
+- **PKG-SC-05 (Explicit Dependency Declaration):** An Optional Package must not depend on another Optional Package unless explicitly declared in package composition metadata (`extra.laraseed.requires` in `composer.json`).
 - **PKG-SC-06 (Strict Dependency Directionality):** Dependencies between Optional Packages must remain strictly directional. A dependency must never silently become bidirectional (e.g. `LostAndFound -> Student` is permitted; `Student -> LostAndFound` is strictly 0).
 - **PKG-SC-07 (Consumer Ownership of Integrations):** The consumer package owns cross-package listeners, extensions, and integration points. If package A extends package B, package A owns the integration, and package B must function completely in the absence of package A.
 - **PKG-SC-08 (Clean Disablement via Provider Composition):** Disabling an Optional Package must remove all of its runtime contributions (routes, ACL, menu, models, storage disks, view hints) naturally through provider composition without leaving runtime errors.
@@ -164,7 +164,7 @@ Two test modes are permanent requirements: Foundation-only default certification
 Every new or refactored Optional Package must satisfy this checklist before completion:
 
 ```text
-[ ] Package metadata: composer.json contains id, type, provider, concord_module, and requires under extra.campushub.
+[ ] Package metadata: composer.json contains id, type, provider, concord_module, and requires under extra.laraseed.
 [ ] Explicit dependencies: all required optional packages are explicitly listed in requires.
 [ ] Production code locality: 100% of feature code resides in packages/Webkul/<Package>/src/.
 [ ] Routes locality: all feature routes reside in packages/Webkul/<Package>/src/Routes/.
@@ -190,30 +190,30 @@ Every new or refactored Optional Package must satisfy this checklist before comp
 
 ### 15.1 LostAndFound Deletion Procedure
 ```text
-1. Disable lost_and_found from active composition (remove from CAMPUSHUB_OPTIONAL_PACKAGES).
-2. Remove manifest catalog entry in config/campushub.php (base_path('packages/Webkul/LostAndFound/composer.json')).
+1. Disable lost_and_found from active composition (remove from LARASEED_OPTIONAL_PACKAGES).
+2. Remove manifest catalog entry in config/laraseed.php (base_path('packages/Webkul/LostAndFound/composer.json')).
 3. Remove root Composer PSR-4 mapping ("Webkul\\LostAndFound\\": "packages/Webkul/LostAndFound/src") in composer.json.
 4. Remove directory packages/Webkul/LostAndFound/.
 5. Run composer dump-autoload.
 6. Rebuild or clear configuration/route caches (php artisan config:clear && php artisan route:clear).
-7. Run Foundation + Student certification (CAMPUSHUB_OPTIONAL_PACKAGES=student vendor/bin/pest).
+7. Run Foundation + Student certification (LARASEED_OPTIONAL_PACKAGES=student vendor/bin/pest).
 ```
 
 ### 15.2 Student Deletion Procedure
 ```text
 1. Follow Procedure 15.1 to remove LostAndFound first (LostAndFound requires Student).
-2. Disable student from active composition (remove from CAMPUSHUB_OPTIONAL_PACKAGES).
-3. Remove manifest catalog entry in config/campushub.php (base_path('packages/Webkul/Student/composer.json')).
+2. Disable student from active composition (remove from LARASEED_OPTIONAL_PACKAGES).
+3. Remove manifest catalog entry in config/laraseed.php (base_path('packages/Webkul/Student/composer.json')).
 4. Remove root Composer PSR-4 mapping ("Webkul\\Student\\": "packages/Webkul/Student/src") in composer.json.
 5. Remove directory packages/Webkul/Student/.
 6. Run composer dump-autoload.
 7. Rebuild or clear configuration/route caches.
-8. Run Foundation-only certification (CAMPUSHUB_OPTIONAL_PACKAGES= vendor/bin/pest).
+8. Run Foundation-only certification (LARASEED_OPTIONAL_PACKAGES= vendor/bin/pest).
 ```
 
 ## 16. Central package registration and portability laws
 
-- **PKG-REG-01 (Implementation Purity):** Package business implementation must never be stored in central registration files (`composer.json`, `config/campushub.php`, `phpunit.xml`).
+- **PKG-REG-01 (Implementation Purity):** Package business implementation must never be stored in central registration files (`composer.json`, `config/laraseed.php`, `phpunit.xml`).
 - **PKG-REG-02 (Metadata Restriction):** Central package registration is allowed only for installation, composition, autoloading, and test-runner metadata.
 - **PKG-REG-03 (Dependency Authority):** Package dependency metadata has one authoritative owner: the package's own manifest (`packages/Webkul/<Package>/composer.json`).
 - **PKG-REG-04 (Deterministic Discovery):** Installed-package discovery must remain deterministic, explicit, and build-time validated.

@@ -45,4 +45,4 @@ Also prohibited:
 ---
 
 ## 4. Applicability
-This rule applies unconditionally to all future architecture, foundation, feature, refactoring, and test implementation tasks in CampusHub.
+This rule applies unconditionally to all future architecture, foundation, feature, refactoring, and test implementation tasks in Laraseed.

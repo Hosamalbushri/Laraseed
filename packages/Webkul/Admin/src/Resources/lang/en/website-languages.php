@@ -19,4 +19,10 @@ return [
     'deactivate' => 'Deactivate',
     'make-primary' => 'Make primary',
     'cannot-deactivate-primary' => 'The primary content language cannot be deactivated.',
+    'cannot-deactivate-last-active' => 'The last active content language cannot be deactivated.',
+    'ltr' => 'Left to Right (LTR)',
+    'rtl' => 'Right to Left (RTL)',
+    'id' => 'ID',
+    'status' => 'Status',
+    'edit' => 'Edit language',
 ];

@@ -1,6 +1,6 @@
 {
     "name": "krayin/laravel-datagrid",
-    "description": "CampusHub generic DataGrid infrastructure",
+    "description": "Laraseed generic DataGrid infrastructure",
     "type": "library",
     "license": "MIT",
     "require": {

@@ -19,4 +19,10 @@ return [
     'deactivate' => 'Devre dışı bırak',
     'make-primary' => 'Birincil yap',
     'cannot-deactivate-primary' => 'Birincil içerik dili devre dışı bırakılamaz.',
+    'cannot-deactivate-last-active' => 'Son aktif içerik dili devre dışı bırakılamaz.',
+    'ltr' => 'Soldan Sağa (LTR)',
+    'rtl' => 'Sağdan Sola (RTL)',
+    'id' => 'Kimlik',
+    'status' => 'Durum',
+    'edit' => 'Dili düzenle',
 ];

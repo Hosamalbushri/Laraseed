@@ -1,10 +1,13 @@
 {
-    "name": "krayin/laravel-crm",
+    "name": "laraseed/laraseed",
     "type": "project",
-    "description": "Krayin CRM",
+    "description": "Laraseed Modular Application Foundation",
     "keywords": [
         "framework",
-        "laravel"
+        "laravel",
+        "laraseed",
+        "foundation",
+        "seed"
     ],
     "license": "MIT",
     "require": {
@@ -25,7 +28,6 @@
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.14",
         "fakerphp/faker": "^1.23",
-        "krayin/krayin-package-generator": "dev-master",
         "laravel/pint": "^1.18",
         "laravel/sail": "^1.38",
         "mockery/mockery": "^1.6",
@@ -61,11 +63,7 @@
             "Webkul\\DataGrid\\": "packages/Webkul/DataGrid/src",
             "Webkul\\Installer\\": "packages/Webkul/Installer/src",
             "Webkul\\User\\": "packages/Webkul/User/src",
-            "Webkul\\Student\\": "packages/Webkul/Student/src",
-            "Webkul\\LostAndFound\\": "packages/Webkul/LostAndFound/src",
-            "Webkul\\Web\\": "packages/Webkul/Web/src",
-            "Webkul\\Theme\\": "packages/Webkul/Theme/src",
-            "Webkul\\Website\\": "packages/Webkul/Website/src"
+            "Webkul\\DebugBar\\": "packages/Webkul/DebugBar/src"
         }
     },
     "autoload-dev": {

@@ -1,6 +1,6 @@
-# CampusHub Package Internal Architecture and Extension Rules
+# Laraseed Package Internal Architecture and Extension Rules
 
-> **Permanent package standard.** Every new package and every package-remediation wave MUST follow this rule together with Rules 06, 07, and 08. The target is a self-owned Bagisto-style package adapted to the mechanisms actually installed in CampusHub—not ceremonial folders or blind copying.
+> **Permanent package standard.** Every new package and every package-remediation wave MUST follow this rule together with Rules 06, 07, and 08. The target is a self-owned Bagisto-style package adapted to the mechanisms actually installed in Laraseed—not ceremonial folders or blind copying.
 
 ## 1. Governing outcome
 
@@ -56,9 +56,9 @@ A provider composes objects and registrations. It must not execute business work
 
 Removing or unregistering the package must naturally remove its provider-owned contributions.
 
-## 5. Verified CampusHub composition mechanisms
+## 5. Verified Laraseed composition mechanisms
 
-CampusHub currently uses:
+Laraseed currently uses:
 
 - Laravel ServiceProviders and container bindings;
 - `loadRoutesFrom`, route groups, `loadViewsFrom`, `loadTranslationsFrom`, and `loadMigrationsFrom`;
@@ -113,7 +113,7 @@ Controllers and ordinary services must not casually query models directly when a
 
 ### DataGrid exception
 
-CampusHub DataGrids may build specialized read query builders directly because the DataGrid abstraction owns filtering, sorting, joins, pagination, export, and query lifecycle events. This exception is limited to DataGrid/read-model composition. It must not spread into ordinary controllers or services.
+Laraseed DataGrids may build specialized read query builders directly because the DataGrid abstraction owns filtering, sorting, joins, pagination, export, and query lifecycle events. This exception is limited to DataGrid/read-model composition. It must not spread into ordinary controllers or services.
 
 ## 10. Services and transaction boundaries
 

@@ -24,7 +24,7 @@ afterEach(function () {
 });
 
 it('allows non-destructive installation into an empty disposable database', function () {
-    $path = tempnam(sys_get_temp_dir(), 'campushub-empty-');
+    $path = tempnam(sys_get_temp_dir(), 'laraseed-empty-');
     useInstallerSafetyDatabase($path);
 
     $manager = app(DatabaseManager::class);
@@ -38,7 +38,7 @@ it('allows non-destructive installation into an empty disposable database', func
 });
 
 it('refuses a populated database with a missing user and preserves its data', function () {
-    $path = tempnam(sys_get_temp_dir(), 'campushub-populated-');
+    $path = tempnam(sys_get_temp_dir(), 'laraseed-populated-');
     useInstallerSafetyDatabase($path);
 
     DB::statement('CREATE TABLE audit_sentinel (id INTEGER PRIMARY KEY, value TEXT NOT NULL)');
@@ -58,7 +58,7 @@ it('refuses a populated database with a missing user and preserves its data', fu
 });
 
 it('fails closed for an ambiguous populated schema and preserves every table', function () {
-    $path = tempnam(sys_get_temp_dir(), 'campushub-ambiguous-');
+    $path = tempnam(sys_get_temp_dir(), 'laraseed-ambiguous-');
     useInstallerSafetyDatabase($path);
 
     DB::statement('CREATE TABLE legacy_records (id INTEGER PRIMARY KEY, value TEXT NOT NULL)');
@@ -73,7 +73,7 @@ it('fails closed for an ambiguous populated schema and preserves every table', f
 });
 
 it('makes web installation unavailable in production', function () {
-    $path = tempnam(sys_get_temp_dir(), 'campushub-production-');
+    $path = tempnam(sys_get_temp_dir(), 'laraseed-production-');
     useInstallerSafetyDatabase($path);
     app()->detectEnvironment(fn () => 'production');
 

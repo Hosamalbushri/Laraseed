@@ -6,12 +6,11 @@ use Prettus\Repository\Providers\RepositoryServiceProvider;
 use Webkul\Admin\Providers\AdminServiceProvider;
 use Webkul\Core\Providers\CoreServiceProvider;
 use Webkul\DataGrid\Providers\DataGridServiceProvider;
+use Webkul\DebugBar\Providers\DebugBarServiceProvider;
 use Webkul\Installer\Providers\InstallerServiceProvider;
-use Webkul\Theme\Providers\ThemeServiceProvider;
 use Webkul\User\Providers\UserServiceProvider;
-use Webkul\Web\Providers\WebServiceProvider;
 
-$optionalProviders = config('campushub.optional_packages.providers', []);
+$optionalProviders = config('laraseed.optional_packages.providers', []);
 
 return [
     /*
@@ -33,7 +32,6 @@ return [
     DataGridServiceProvider::class,
     InstallerServiceProvider::class,
     UserServiceProvider::class,
+    DebugBarServiceProvider::class,
     ...$optionalProviders,
-    ThemeServiceProvider::class,
-    WebServiceProvider::class,
 ];

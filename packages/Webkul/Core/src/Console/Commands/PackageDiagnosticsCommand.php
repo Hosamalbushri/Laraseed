@@ -12,14 +12,14 @@ class PackageDiagnosticsCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'campushub:packages';
+    protected $signature = 'laraseed:packages';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Display the installed and enabled state of CampusHub optional packages (read-only)';
+    protected $description = 'Display the installed and enabled state of Laraseed optional packages (read-only)';
 
     /**
      * Execute the console command.
@@ -66,7 +66,7 @@ class PackageDiagnosticsCommand extends Command
 
         if ($enabledIds === []) {
             $this->line('Active optional composition: Foundation only.');
-            $this->line('Optional package composition is controlled through CAMPUSHUB_OPTIONAL_PACKAGES.');
+            $this->line('Optional package composition is controlled through LARASEED_OPTIONAL_PACKAGES.');
         } else {
             $this->line('Active optional composition: '.implode(', ', $enabledIds));
         }

@@ -15,16 +15,8 @@
             <directory suffix="Test.php">./tests/Feature</directory>
         </testsuite>
 
-        <testsuite name="Student">
-            <directory suffix="Test.php">./packages/Webkul/Student/tests</directory>
-        </testsuite>
-
-        <testsuite name="LostAndFound">
-            <directory suffix="Test.php">./packages/Webkul/LostAndFound/tests</directory>
-        </testsuite>
-
-        <testsuite name="Website">
-            <directory suffix="Test.php">./packages/Webkul/Website/tests</directory>
+        <testsuite name="Composition">
+            <directory suffix="Test.php">./tests/Composition</directory>
         </testsuite>
     </testsuites>
 

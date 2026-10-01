@@ -19,4 +19,10 @@ return [
     'deactivate' => 'Vô hiệu hóa',
     'make-primary' => 'Đặt làm chính',
     'cannot-deactivate-primary' => 'Không thể vô hiệu hóa ngôn ngữ nội dung chính.',
+    'cannot-deactivate-last-active' => 'Không thể vô hiệu hóa ngôn ngữ nội dung hoạt động cuối cùng.',
+    'ltr' => 'Từ trái sang phải (LTR)',
+    'rtl' => 'Từ phải sang trái (RTL)',
+    'id' => 'ID',
+    'status' => 'Trạng thái',
+    'edit' => 'Chỉnh sửa ngôn ngữ',
 ];

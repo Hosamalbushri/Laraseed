@@ -15,7 +15,7 @@ trait InteractsWithOptionalPackageComposition
         $process = new Process(
             [PHP_BINARY, base_path('artisan'), ...$command],
             base_path(),
-            ['CAMPUSHUB_OPTIONAL_PACKAGES' => implode(',', $packages)],
+            ['LARASEED_OPTIONAL_PACKAGES' => implode(',', $packages)],
         );
         $process->setTimeout(30);
         $process->run();

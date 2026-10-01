@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2f942f20e4da56ea242d61b30ab6c3e3",
+    "content-hash": "8ab390274ec1174444fe5c2c589d0f35",
     "packages": [
         {
             "name": "brick/math",
@@ -7874,52 +7874,6 @@
             "time": "2025-03-19T14:43:43+00:00"
         },
         {
-            "name": "krayin/krayin-package-generator",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/krayin/krayin-package-generator.git",
-                "reference": "b9a61169ca985e45e83b9225c885b77692793f39"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/krayin/krayin-package-generator/zipball/b9a61169ca985e45e83b9225c885b77692793f39",
-                "reference": "b9a61169ca985e45e83b9225c885b77692793f39",
-                "shasum": ""
-            },
-            "default-branch": true,
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "aliases": [],
-                    "providers": [
-                        "Webkul\\PackageGenerator\\Providers\\PackageGeneratorServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Webkul\\PackageGenerator\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Jitendra Singh",
-                    "email": "jitendra@webkul.com"
-                }
-            ],
-            "description": "Krayin Package Generator",
-            "support": {
-                "issues": "https://github.com/krayin/krayin-package-generator/issues",
-                "source": "https://github.com/krayin/krayin-package-generator/tree/v2.0.0"
-            },
-            "time": "2024-09-27T04:57:16+00:00"
-        },
-        {
             "name": "laravel/pint",
             "version": "v1.29.0",
             "source": {
@@ -11228,9 +11182,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "krayin/krayin-package-generator": 20
-    },
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

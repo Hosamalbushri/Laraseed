@@ -4,124 +4,144 @@ use Tests\Support\InteractsWithOptionalPackageComposition;
 use Webkul\Core\Exceptions\InvalidPackageComposition;
 use Webkul\Core\Packages\OptionalPackageComposition;
 use Webkul\Core\Packages\OptionalPackageManifestLoader;
-use Webkul\LostAndFound\Providers\LostAndFoundServiceProvider;
-use Webkul\Student\Providers\StudentServiceProvider;
+use Webkul\Core\Providers\CoreServiceProvider;
+use Webkul\User\Providers\UserServiceProvider;
 
 uses(InteractsWithOptionalPackageComposition::class);
 
-function optionalPackageManifestPaths(): array
+function sampleSyntheticPackageCatalog(): array
 {
     return [
-        base_path('packages/Webkul/Student/composer.json'),
-        base_path('packages/Webkul/LostAndFound/composer.json'),
+        'base_addon' => [
+            'id' => 'base_addon',
+            'composer_name' => 'laraseed/base-addon',
+            'provider' => CoreServiceProvider::class,
+            'concord_module' => null,
+            'requires' => [],
+        ],
+        'extended_addon' => [
+            'id' => 'extended_addon',
+            'composer_name' => 'laraseed/extended-addon',
+            'provider' => UserServiceProvider::class,
+            'concord_module' => null,
+            'requires' => ['base_addon'],
+        ],
     ];
 }
 
 it('keeps the repository development default Foundation only', function () {
-    $source = file_get_contents(config_path('campushub.php'));
+    $source = file_get_contents(config_path('laraseed.php'));
     $example = file_get_contents(base_path('.env.example'));
 
-    expect($source)->toContain("env('CAMPUSHUB_OPTIONAL_PACKAGES', '')")
-        ->and($example)->toMatch('/^CAMPUSHUB_OPTIONAL_PACKAGES=$/m');
+    expect($source)->toContain("env('LARASEED_OPTIONAL_PACKAGES', '')")
+        ->and($example)->toMatch('/^LARASEED_OPTIONAL_PACKAGES=$/m');
 });
 
-it('compiles canonical manifest metadata and Composer dependencies', function () {
-    $catalog = (new OptionalPackageManifestLoader)->load(optionalPackageManifestPaths());
-    $composition = new OptionalPackageComposition($catalog, ['lost_and_found', 'student']);
+it('compiles canonical manifest metadata and resolves dependencies in topological order', function () {
+    $catalog = sampleSyntheticPackageCatalog();
+    $composition = new OptionalPackageComposition($catalog, ['extended_addon', 'base_addon']);
 
-    expect(array_keys($catalog))->toBe(['lost_and_found', 'student'])
-        ->and($composition->enabledPackages())->toBe(['student', 'lost_and_found'])
+    expect(array_keys($catalog))->toBe(['base_addon', 'extended_addon'])
+        ->and($composition->enabledPackages())->toBe(['base_addon', 'extended_addon'])
         ->and($composition->providers())->toBe([
-            StudentServiceProvider::class,
-            LostAndFoundServiceProvider::class,
+            CoreServiceProvider::class,
+            UserServiceProvider::class,
         ])
         ->and($composition->dependencyGraph())->toBe([
-            'lost_and_found' => ['student'],
-            'student' => [],
-        ])
-        ->and($composition->concordModules())->toBe([
-            Webkul\LostAndFound\Providers\ModuleServiceProvider::class,
+            'base_addon' => [],
+            'extended_addon' => ['base_addon'],
         ]);
 });
 
 it('accepts every supported valid package set', function (array $enabled) {
-    $catalog = (new OptionalPackageManifestLoader)->load(optionalPackageManifestPaths());
+    $catalog = sampleSyntheticPackageCatalog();
     $composition = new OptionalPackageComposition($catalog, $enabled);
 
     expect($composition->enabledPackages())->toHaveCount(count($enabled));
 })->with([
     'Foundation only' => [[]],
-    'Student' => [['student']],
-    'Student and LostAndFound' => [['student', 'lost_and_found']],
+    'Base addon' => [['base_addon']],
+    'Base and Extended addons' => [['base_addon', 'extended_addon']],
 ]);
 
 it('rejects invalid dependency combinations before application boot', function (array $enabled, string $message) {
-    $catalog = (new OptionalPackageManifestLoader)->load(optionalPackageManifestPaths());
+    $catalog = sampleSyntheticPackageCatalog();
 
     expect(fn () => new OptionalPackageComposition($catalog, $enabled))
         ->toThrow(InvalidPackageComposition::class, $message);
 })->with([
-    'LostAndFound without Student' => [['lost_and_found'], 'Optional package "lost_and_found" requires enabled package "student".'],
+    'Extended without Base' => [['extended_addon'], 'Optional package "extended_addon" requires enabled package "base_addon".'],
 ]);
 
 it('derives reverse dependency safety from the forward graph', function () {
-    $catalog = (new OptionalPackageManifestLoader)->load(optionalPackageManifestPaths());
-    $composition = new OptionalPackageComposition($catalog, ['student', 'lost_and_found']);
+    $catalog = sampleSyntheticPackageCatalog();
+    $composition = new OptionalPackageComposition($catalog, ['base_addon', 'extended_addon']);
 
-    expect($composition->enabledDependents('student'))->toBe(['lost_and_found'])
-        ->and($composition->canDisable('student'))->toBeFalse()
-        ->and($composition->canDisable('lost_and_found'))->toBeTrue();
+    expect($composition->enabledDependents('base_addon'))->toBe(['extended_addon'])
+        ->and($composition->canDisable('base_addon'))->toBeFalse()
+        ->and($composition->canDisable('extended_addon'))->toBeTrue();
 });
 
 it('rejects unknown configured package IDs', function () {
-    $catalog = (new OptionalPackageManifestLoader)->load(optionalPackageManifestPaths());
+    $catalog = sampleSyntheticPackageCatalog();
 
-    expect(fn () => new OptionalPackageComposition($catalog, ['student', 'studnet']))
-        ->toThrow(InvalidPackageComposition::class, 'Unknown Optional package ID [studnet].');
+    expect(fn () => new OptionalPackageComposition($catalog, ['base_addon', 'unknown_pkg']))
+        ->toThrow(InvalidPackageComposition::class, 'Unknown Optional package ID [unknown_pkg].');
 });
 
 it('rejects duplicate package IDs from manifest discovery', function () {
-    expect(fn () => (new OptionalPackageManifestLoader)->load([
-        optionalPackageManifestPaths()[0],
-        optionalPackageManifestPaths()[0],
-    ]))->toThrow(InvalidPackageComposition::class, 'Duplicate Optional package ID [student].');
+    $manifest = [
+        'name' => 'laraseed/sample-pkg',
+        'extra' => [
+            'laraseed' => [
+                'id' => 'sample_pkg',
+                'type' => 'optional',
+                'provider' => CoreServiceProvider::class,
+            ],
+        ],
+    ];
+
+    $path = tempnam(sys_get_temp_dir(), 'laraseed-test-manifest-');
+    file_put_contents($path, json_encode($manifest, JSON_THROW_ON_ERROR));
+
+    try {
+        expect(fn () => (new OptionalPackageManifestLoader)->load([$path, $path]))
+            ->toThrow(InvalidPackageComposition::class, 'Duplicate Optional package ID [sample_pkg].');
+    } finally {
+        @unlink($path);
+    }
 });
 
-it('rejects invalid provider and Concord module classes', function (string $field) {
-    $manifest = json_decode(file_get_contents(optionalPackageManifestPaths()[0]), true, flags: JSON_THROW_ON_ERROR);
-    $manifest['extra']['campushub'][$field] = 'CampusHub\\Missing\\Provider';
-    $path = tempnam(sys_get_temp_dir(), 'campushub-package-');
+it('rejects invalid provider class in manifest', function () {
+    $manifest = [
+        'name' => 'laraseed/sample-pkg',
+        'extra' => [
+            'laraseed' => [
+                'id' => 'sample_pkg',
+                'type' => 'optional',
+                'provider' => 'NonExistent\\Class\\Provider',
+            ],
+        ],
+    ];
+
+    $path = tempnam(sys_get_temp_dir(), 'laraseed-test-manifest-');
     file_put_contents($path, json_encode($manifest, JSON_THROW_ON_ERROR));
 
     try {
         expect(fn () => (new OptionalPackageManifestLoader)->load([$path]))
-            ->toThrow(InvalidPackageComposition::class);
+            ->toThrow(InvalidPackageComposition::class, 'Optional package [sample_pkg] declares an invalid provider class.');
     } finally {
-        unlink($path);
+        @unlink($path);
     }
-})->with(['provider', 'concord_module']);
-
-it('rejects dependency cycles deterministically', function () {
-    $catalog = (new OptionalPackageManifestLoader)->load(optionalPackageManifestPaths());
-    $catalog['student']['requires'] = ['lost_and_found'];
-
-    expect(fn () => new OptionalPackageComposition($catalog, ['student', 'lost_and_found']))
-        ->toThrow(InvalidPackageComposition::class, 'Optional package dependency cycle detected');
 });
 
-it('uses one state for provider and Concord route composition across the valid matrix', function (array $enabled, int $count, bool $student, bool $lostFound) {
-    $routes = $this->routesForComposition($enabled);
-    $names = array_column($routes, 'name');
+it('rejects dependency cycles deterministically', function () {
+    $catalog = sampleSyntheticPackageCatalog();
+    $catalog['base_addon']['requires'] = ['extended_addon'];
 
-    expect($routes)->toHaveCount($count)
-        ->and(in_array('student.login', $names, true))->toBe($student)
-        ->and(in_array('student.lost_found.reports.store', $names, true))->toBe($lostFound)
-        ->and(in_array('web.home', $names, true))->toBeTrue();
-})->with([
-    'Foundation only' => [[], 69, false, false],
-    'Student' => [['student'], 81, true, false],
-    'Student and LostAndFound' => [['student', 'lost_and_found'], 102, true, true],
-]);
+    expect(fn () => new OptionalPackageComposition($catalog, ['base_addon', 'extended_addon']))
+        ->toThrow(InvalidPackageComposition::class, 'Optional package dependency cycle detected');
+});
 
 it('fails invalid deployment compositions with the architecture exception', function (array $enabled, string $message) {
     $result = $this->runCompositionCommand($enabled, ['about', '--only=environment']);
@@ -131,39 +151,36 @@ it('fails invalid deployment compositions with the architecture exception', func
         ->not->toContain('Class not found')
         ->not->toContain('SQLSTATE');
 })->with([
-    'LostAndFound without Student' => [['lost_and_found'], 'Optional package "lost_and_found" requires enabled package "student".'],
-    'unknown package' => [['student', 'studnet'], 'Unknown Optional package ID [studnet].'],
+    'unknown package' => [['unknown_optional_package'], 'Unknown Optional package ID [unknown_optional_package].'],
 ]);
 
-it('reports installed and enabled optional package status accurately via campushub:packages without mutating state', function () {
+it('reports installed and enabled optional package status accurately via laraseed:packages without mutating state', function () {
     $envBefore = file_exists(base_path('.env')) ? file_get_contents(base_path('.env')) : null;
 
-    // 1. Foundation-only composition
-    $foundationResult = $this->runCompositionCommand([], ['campushub:packages']);
+    $foundationResult = $this->runCompositionCommand([], ['laraseed:packages']);
     expect($foundationResult['exit_code'])->toBe(0)
-        ->and($foundationResult['output'])->toContain('Student')
-        ->and($foundationResult['output'])->toContain('LostAndFound')
-        ->and($foundationResult['output'])->toContain('Website')
-        ->and($foundationResult['output'])->toContain('DISABLED')
         ->and($foundationResult['output'])->toContain('Active optional composition: Foundation only.')
-        ->and($foundationResult['output'])->toContain('CAMPUSHUB_OPTIONAL_PACKAGES');
-
-    // 2. Website-only composition
-    $websiteResult = $this->runCompositionCommand(['website'], ['campushub:packages']);
-    expect($websiteResult['exit_code'])->toBe(0)
-        ->and($websiteResult['output'])->toContain('ACTIVE')
-        ->and($websiteResult['output'])->toContain('DISABLED')
-        ->and($websiteResult['output'])->toContain('Active optional composition: website');
-
-    // 3. Full composition
-    $fullResult = $this->runCompositionCommand(['student', 'lost_and_found', 'website'], ['campushub:packages']);
-    expect($fullResult['exit_code'])->toBe(0)
-        ->and($fullResult['output'])->toContain('registered')
-        ->and($fullResult['output'])->toContain('ACTIVE')
-        ->and($fullResult['output'])->not->toContain('DISABLED')
-        ->and($fullResult['output'])->toContain('Active optional composition: student, lost_and_found, website');
+        ->and($foundationResult['output'])->toContain('Optional package composition is controlled through LARASEED_OPTIONAL_PACKAGES.');
 
     $envAfter = file_exists(base_path('.env')) ? file_get_contents(base_path('.env')) : null;
     expect($envAfter)->toBe($envBefore);
 });
 
+it('verifies that Foundation-only route composition contains zero deleted package routes', function () {
+    $routes = $this->routesForComposition([]);
+    $names = array_filter(array_column($routes, 'name'));
+    $actions = array_column($routes, 'action');
+
+    expect($routes)->not->toBeEmpty();
+    foreach ($names as $name) {
+        expect($name)->not->toStartWith('student.')
+            ->not->toStartWith('website.')
+            ->not->toBe('web.home');
+    }
+    foreach ($actions as $action) {
+        expect($action)->not->toContain('Webkul\\Student')
+            ->not->toContain('Webkul\\LostAndFound')
+            ->not->toContain('Webkul\\Website')
+            ->not->toContain('Webkul\\Web');
+    }
+});

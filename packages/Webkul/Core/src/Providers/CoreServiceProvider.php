@@ -59,9 +59,14 @@ class CoreServiceProvider extends ServiceProvider
             AuthenticationRedirectResolver::class,
         );
 
+        $this->app->singleton(
+            \Webkul\Core\Contracts\ContentLocaleManager::class,
+            \Webkul\Core\Services\ContentLocaleService::class,
+        );
+
         $this->app->singleton(OptionalPackageComposition::class, fn ($app) => new OptionalPackageComposition(
-            $app['config']->get('campushub.optional_packages.catalog', []),
-            $app['config']->get('campushub.optional_packages.enabled', []),
+            $app['config']->get('laraseed.optional_packages.catalog', []),
+            $app['config']->get('laraseed.optional_packages.enabled', []),
         ));
     }
 

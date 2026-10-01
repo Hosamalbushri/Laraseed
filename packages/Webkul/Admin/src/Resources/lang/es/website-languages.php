@@ -19,4 +19,10 @@ return [
     'deactivate' => 'Desactivar',
     'make-primary' => 'Establecer como principal',
     'cannot-deactivate-primary' => 'No se puede desactivar el idioma principal del contenido.',
+    'cannot-deactivate-last-active' => 'El último idioma de contenido activo no se puede desactivar.',
+    'ltr' => 'Izquierda a derecha (LTR)',
+    'rtl' => 'Derecha a izquierda (RTL)',
+    'id' => 'ID',
+    'status' => 'Estado',
+    'edit' => 'Editar idioma',
 ];

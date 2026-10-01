@@ -5,7 +5,6 @@ namespace Tests\Composition;
 use Illuminate\Database\Seeder;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Routing\Route as RoutingRoute;
-use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 use Webkul\Admin\Providers\AdminServiceProvider;
@@ -18,20 +17,9 @@ use Webkul\DataGrid\Models\SavedFilter;
 use Webkul\DataGrid\Providers\DataGridServiceProvider;
 use Webkul\Installer\Database\Seeders\DatabaseSeeder as InstallerDatabaseSeeder;
 use Webkul\Installer\Providers\InstallerServiceProvider;
-use Webkul\LostAndFound\Contracts\FoundItem as FoundItemContract;
-use Webkul\LostAndFound\Providers\LostAndFoundServiceProvider;
-use Webkul\Student\Providers\StudentServiceProvider;
-use Webkul\Theme\Contracts\ThemeRegistryContract;
-use Webkul\Theme\Contracts\ThemeResolverContract;
-use Webkul\Theme\Providers\ThemeServiceProvider;
 use Webkul\User\Contracts\User as UserContract;
 use Webkul\User\Models\User;
 use Webkul\User\Providers\UserServiceProvider;
-use Webkul\Web\Contracts\NavigationRegistryContract;
-use Webkul\Web\Contracts\SectionRegistryContract;
-use Webkul\Web\Contracts\SeoMetadataContract;
-use Webkul\Web\Contracts\WebContextContract;
-use Webkul\Web\Providers\WebServiceProvider;
 
 class FoundationOnlyApplicationTest extends TestCase
 {
@@ -39,12 +27,12 @@ class FoundationOnlyApplicationTest extends TestCase
 
     public function test_repository_default_is_foundation_only_without_an_override(): void
     {
-        $source = file_get_contents(config_path('campushub.php'));
+        $source = file_get_contents(config_path('laraseed.php'));
         $example = file_get_contents(base_path('.env.example'));
 
-        $this->assertStringContainsString("env('CAMPUSHUB_OPTIONAL_PACKAGES', '')", $source);
-        $this->assertMatchesRegularExpression('/^CAMPUSHUB_OPTIONAL_PACKAGES=$/m', $example);
-        $this->assertSame([], config('campushub.optional_packages.enabled'));
+        $this->assertStringContainsString("env('LARASEED_OPTIONAL_PACKAGES', '')", $source);
+        $this->assertMatchesRegularExpression('/^LARASEED_OPTIONAL_PACKAGES=$/m', $example);
+        $this->assertSame([], config('laraseed.optional_packages.enabled'));
         $this->assertSame([], app(OptionalPackageComposition::class)->enabledPackages());
     }
 
@@ -53,24 +41,24 @@ class FoundationOnlyApplicationTest extends TestCase
         $composition = app(OptionalPackageComposition::class);
         $routes = collect(Route::getRoutes()->getRoutes());
         $optionalRoutes = $routes->filter(fn (RoutingRoute $route): bool => str_starts_with($route->getActionName(), 'Webkul\\Student\\')
-            || str_starts_with($route->getActionName(), 'Webkul\\LostAndFound\\'));
+            || str_starts_with($route->getActionName(), 'Webkul\\LostAndFound\\')
+            || str_starts_with($route->getActionName(), 'Webkul\\Website\\')
+            || str_starts_with($route->getActionName(), 'Webkul\\Web\\'));
 
         $this->assertSame([], $composition->enabledPackages());
-        $this->assertCount(69, $routes);
+        $this->assertCount(67, $routes);
         $this->assertCount(0, $optionalRoutes);
-        $this->assertFalse(app()->providerIsLoaded(StudentServiceProvider::class));
-        $this->assertFalse(app()->providerIsLoaded(LostAndFoundServiceProvider::class));
-        $this->assertSame([], config('campushub.optional_packages.concord_modules'));
-        $this->assertNull(app('concord')->model(FoundItemContract::class));
+        $this->assertSame([], config('laraseed.optional_packages.concord_modules'));
         $this->assertArrayNotHasKey('student', config('auth.guards'));
         $this->assertArrayNotHasKey('students', config('auth.providers'));
         $this->assertNull(config('filesystems.disks.lost_found_private'));
-        $this->assertFalse(app(NavigationRegistryContract::class)->has('event.events', 'header'));
 
         $viewHints = app('view')->getFinder()->getHints();
         $this->assertArrayNotHasKey('student', $viewHints);
         $this->assertArrayNotHasKey('event', $viewHints);
         $this->assertArrayNotHasKey('lost_found', $viewHints);
+        $this->assertArrayNotHasKey('web', $viewHints);
+        $this->assertArrayNotHasKey('website', $viewHints);
 
         $aclKeys = collect(config('acl', []))->pluck('key');
         $menuKeys = collect(config('menu.admin', []))->pluck('key');
@@ -91,8 +79,6 @@ class FoundationOnlyApplicationTest extends TestCase
             AdminServiceProvider::class,
             DataGridServiceProvider::class,
             InstallerServiceProvider::class,
-            WebServiceProvider::class,
-            ThemeServiceProvider::class,
         ] as $provider) {
             $this->assertTrue(app()->providerIsLoaded($provider), "Foundation provider [{$provider}] was not loaded.");
         }
@@ -116,58 +102,11 @@ class FoundationOnlyApplicationTest extends TestCase
         $this->assertAuthenticatedAs($admin, 'user');
     }
 
-    public function test_foundation_only_root_web_context_localization_and_base_theme_work(): void
+    public function test_view_finder_is_standard_laravel_file_view_finder(): void
     {
-        $this->withSession(['web_locale' => 'en'])
-            ->get('/')
-            ->assertOk()
-            ->assertSee('<html lang="en" dir="ltr" data-theme="base">', false);
-
-        $this->assertSame('en', app(WebContextContract::class)->locale());
-        $this->assertSame('ltr', app(WebContextContract::class)->direction());
-        $this->assertSame('base', app(ThemeResolverContract::class)->resolveActiveTheme()->id);
-
-        $this->withSession(['web_locale' => 'ar'])
-            ->get('/')
-            ->assertOk()
-            ->assertSee('<html lang="ar" dir="rtl" data-theme="base">', false);
-
-        $this->assertSame('ar', app(WebContextContract::class)->locale());
-        $this->assertSame('rtl', app(WebContextContract::class)->direction());
-        $this->assertNotSame('admin::app', trans('admin::app.components.layouts.header.mega-search.title'));
-        $this->assertNotSame('web::app', trans('web::app.home.seo.title'));
-    }
-
-    public function test_web_registries_seo_and_components_work_without_optional_contributions(): void
-    {
-        $navigation = app(NavigationRegistryContract::class);
-        $sections = app(SectionRegistryContract::class);
-        $seo = app(SeoMetadataContract::class);
-
-        $this->assertCount(0, $navigation->getItems('header'));
-        $this->assertCount(0, $sections->getSections('home'));
-
-        $seo->setTitle('Foundation')->setDescription('Foundation baseline');
-        $this->assertSame('Foundation | CampusHub', $seo->getTitle());
-        $this->assertSame('Foundation baseline', $seo->getDescription());
-        $this->assertStringContainsString('<title>Foundation | CampusHub</title>', $seo->renderHeadHtml());
-
-        $component = Blade::render('<x-web::button>Foundation action</x-web::button>');
-        $this->assertStringContainsString('<button', $component);
-        $this->assertStringContainsString('Foundation action', $component);
-    }
-
-    public function test_theme_registry_resolver_and_base_inheritance_are_operational(): void
-    {
-        $registry = app(ThemeRegistryContract::class);
-        $resolver = app(ThemeResolverContract::class);
-
-        $this->assertTrue($registry->has('base'));
-        $this->assertSame('base', $resolver->resolveActiveTheme()->id);
-        $this->assertSame(['base'], array_map(
-            fn ($theme): string => $theme->id,
-            $resolver->resolveActiveInheritanceChain(),
-        ));
+        $finder = app('view.finder');
+        $this->assertInstanceOf(\Illuminate\View\FileViewFinder::class, $finder);
+        $this->assertFalse(str_contains(get_class($finder), 'ThemeViewFinder'));
     }
 
     public function test_foundation_only_admin_shell_and_extension_hosts_work(): void
@@ -215,13 +154,11 @@ class FoundationOnlyApplicationTest extends TestCase
             || str_starts_with(ltrim($route->getActionName(), '\\'), 'Laravel\\')
             || $route->getActionName() === 'Closure');
 
-        $this->assertCount(69, $routes);
+        $this->assertCount(67, $routes);
         $this->assertCount(3, $frameworkRoutes);
-        $this->assertSame(66, $routes->count() - $frameworkRoutes->count());
+        $this->assertSame(64, $routes->count() - $frameworkRoutes->count());
 
         $root = $routes->first(fn (RoutingRoute $route): bool => $route->uri() === '/' && in_array('GET', $route->methods(), true));
-        $this->assertNotNull($root);
-        $this->assertSame('web.home', $root->getName());
-        $this->assertSame('Webkul\\Web\\Http\\Controllers\\HomeController@index', $root->getActionName());
+        $this->assertNull($root, 'Public root / route is intentionally absent in Foundation-only state');
     }
 }

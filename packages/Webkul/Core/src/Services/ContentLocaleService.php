@@ -5,15 +5,18 @@ namespace Webkul\Core\Services;
 use DomainException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use InvalidArgumentException;
 use LogicException;
+use Webkul\Core\Contracts\ContentLocaleManager;
+use Webkul\Core\Enums\LocaleDirection;
 use Webkul\Core\Models\Locale;
 use Webkul\Core\Repositories\LocaleRepository;
 
 /**
  * Authority for website/content languages; never reads or changes Admin UI locale.
  */
-class ContentLocaleService
+class ContentLocaleService implements ContentLocaleManager
 {
     public function __construct(protected LocaleRepository $locales) {}
 
@@ -40,6 +43,107 @@ class ContentLocaleService
         return Locale::query()->orderBy('sort_order')->orderBy('code')->get();
     }
 
+    public function findLocale(int $id): Locale
+    {
+        return $this->locales->findOrFail($id);
+    }
+
+    /**
+     * Canonical validation rules for creating a content locale.
+     *
+     * @return array<string, mixed>
+     */
+    public function creationRules(): array
+    {
+        return [
+            'code' => [
+                'required',
+                'string',
+                'max:10',
+                'regex:/\A[a-z]{2,3}(?:[-_](?:[a-z]{2}|[0-9]{3}))?\z/iD',
+                Rule::unique('locales', 'code'),
+            ],
+            'name' => ['required', 'string', 'max:120'],
+            'direction' => ['required', Rule::in(['ltr', 'rtl', LocaleDirection::LTR, LocaleDirection::RTL])],
+            'sort_order' => ['required', 'integer', 'min:0'],
+        ];
+    }
+
+    /**
+     * Canonical validation rules for updating content locale metadata.
+     *
+     * @return array<string, mixed>
+     */
+    public function updateRules(): array
+    {
+        return [
+            'name' => ['required', 'string', 'max:120'],
+            'direction' => ['required', Rule::in(['ltr', 'rtl', LocaleDirection::LTR, LocaleDirection::RTL])],
+            'sort_order' => ['required', 'integer', 'min:0'],
+        ];
+    }
+
+    /**
+     * Validate and normalize raw input for locale creation.
+     *
+     * @param  array<string, mixed>  $attributes
+     * @return array<string, mixed>
+     */
+    public function validateCreation(array $attributes): array
+    {
+        $data = $attributes;
+
+        if (isset($data['code']) && is_string($data['code'])) {
+            try {
+                $data['code'] = Locale::normalizeCode($data['code']);
+            } catch (InvalidArgumentException) {
+                // Let the regex rule catch and surface a formatted validation error
+            }
+        }
+
+        if (isset($data['direction']) && $data['direction'] instanceof LocaleDirection) {
+            $data['direction'] = $data['direction']->value;
+        }
+
+        return validator($data, $this->creationRules())->validate();
+    }
+
+    /**
+     * Validate raw input for locale metadata update.
+     *
+     * @param  array<string, mixed>  $attributes
+     * @return array<string, mixed>
+     */
+    public function validateUpdate(array $attributes): array
+    {
+        $data = $attributes;
+
+        if (isset($data['direction']) && $data['direction'] instanceof LocaleDirection) {
+            $data['direction'] = $data['direction']->value;
+        }
+
+        return validator($data, $this->updateRules())->validate();
+    }
+
+    /**
+     * Domain operation: validate, normalize, and create a new content locale.
+     * Newly created locales always start inactive.
+     *
+     * @param  array<string, mixed>  $attributes
+     */
+    public function createLocale(array $attributes): Locale
+    {
+        $validated = $this->validateCreation($attributes);
+        $validated['is_active'] = false;
+
+        return $this->create($validated);
+    }
+
+    /**
+     * Persist a content locale with raw attributes.
+     *
+     * @param  array<string, mixed>  $attributes
+     */
     public function create(array $attributes): Locale
     {
         $this->only($attributes, ['code', 'name', 'direction', 'sort_order', 'is_active']);
@@ -55,10 +159,12 @@ class ContentLocaleService
     {
         $this->only($attributes, ['name', 'direction', 'sort_order']);
 
-        return DB::transaction(function () use ($id, $attributes): Locale {
+        $validated = $this->validateUpdate($attributes);
+
+        return DB::transaction(function () use ($id, $validated): Locale {
             $this->setting(true);
             $locale = Locale::query()->lockForUpdate()->findOrFail($id);
-            $locale->update($attributes);
+            $locale->update($validated);
 
             return $locale->refresh();
         }, 3);

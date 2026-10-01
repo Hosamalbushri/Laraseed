@@ -11,14 +11,14 @@ class Version extends Command
      *
      * @var string
      */
-    protected $signature = 'krayin-crm:version';
+    protected $signature = 'laraseed:version';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Displays current version of Krayin CRM installed';
+    protected $description = 'Displays current version of Laraseed installed';
 
     /**
      * Create a new command instance.

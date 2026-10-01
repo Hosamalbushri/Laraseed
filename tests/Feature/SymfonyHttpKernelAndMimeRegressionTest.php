@@ -7,10 +7,6 @@ use Webkul\Admin\Notifications\Common;
 
 uses(DatabaseTransactions::class);
 
-it('serves the public homepage with HTTP 200 OK via HttpKernel', function () {
-    $this->get('/')->assertOk();
-});
-
 it('returns HTTP 404 Not Found for non-existent routes', function () {
     $this->get('/non-existent-route-for-http-kernel-test')->assertNotFound();
 });

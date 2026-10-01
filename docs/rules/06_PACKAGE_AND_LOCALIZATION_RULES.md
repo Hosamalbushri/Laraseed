@@ -1,6 +1,6 @@
-# CampusHub Package Ownership and Localization Rules
+# Laraseed Package Ownership and Localization Rules
 
-> **Repository-wide authority.** Any future AI agent or developer creating or modifying a CampusHub package MUST comply with this rule. Package creation is blocked until localization classification is complete. A passing test suite does not justify violating localization architecture. Do not modify tests merely to permit an architecture violation.
+> **Repository-wide authority.** Any future AI agent or developer creating or modifying a Laraseed package MUST comply with this rule. Package creation is blocked until localization classification is complete. A passing test suite does not justify violating localization architecture. Do not modify tests merely to permit an architecture violation.
 
 This rule complements [the rules index](./README.md) and the [LostAndFound domain rules](./LOST_AND_FOUND_PACKAGE_RULES.md). Repository-wide instructions take precedence; the existing package-specific security and domain invariants remain in force. These rules describe architecture, not permission to add migrations, a Locale model, or localized LostAndFound storage.
 
@@ -13,14 +13,14 @@ This rule complements [the rules index](./README.md) and the [LostAndFound domai
 
 Language files do **not** hold business records. A database Locale being enabled does **not** guarantee a package has a complete static translation for it; a package language file does **not** mean a business record has a translation. Fallback output must never be represented as an actual translation.
 
-## 2. Verified pre-Step-01 CampusHub baseline (2026-09-28)
+## 2. Verified pre-Step-01 Laraseed baseline (2026-09-28)
 
 - `config/app.php` defines `locale = env('APP_LOCALE', 'en')`, `fallback_locale = 'en'`, and a fixed `available_locales` map of `ar` and `en`. `Webkul\Core\Core::locales()` reads that map for the Admin selector. The seven language directories currently shipped by several packages (`ar`, `en`, `es`, `fa`, `pt_BR`, `tr`, `vi`) are **static-resource coverage**, not seven dynamically enabled locales.
 - `Webkul\Admin\Http\Middleware\Locale` reads `general.general.locale_settings.locale` through `core()->getConfigData()` and otherwise keeps the app locale. The Admin configuration field has default `en`; `SystemConfig::getConfigData()` checks `core_config` first, then the configured default. The inspected runtime database stores `ar` for that setting. This is a site-wide Admin setting, not a per-user locale preference.
 - Student routes and Shop web routes use `admin_locale`; LostAndFound student routes also use it. There is no verified Student-specific selection or session locale flow. Public Shop pages use the same middleware rather than Bagisto's channel locale middleware.
 - Only Installer middleware currently reads a `locale` query parameter and stores `installer_locale` in the session. This is Installer behavior, not a general Admin/Student/Public locale contract. Inbound `routes/api.php` and Shop `Routes/api.php` define no locale-aware application endpoints.
 - Admin, Shop, and Installer layouts emit `<html lang>` and `<html dir>` from the app locale, using hardcoded `ar`/`fa` (Installer also `he`) RTL lists. This is partial presentation support; the new registry direction metadata is not yet wired into those layouts. Student pages are rendered within a Shop layout.
-- Before Step 01 there was no CampusHub `Locale` model, contract, proxy, repository, or `locales` table. The inspected runtime database has not been migrated to the new schema. There is still no channel/site locale relation or dynamic language-management UI.
+- Before Step 01 there was no Laraseed `Locale` model, contract, proxy, repository, or `locales` table. The inspected runtime database has not been migrated to the new schema. There is still no channel/site locale relation or dynamic language-management UI.
 - Shop's 2025 theme-customization translation migration is historical: `2025_03_23_130000_consolidate_shop_theme_options.php` moves options into the base table and drops the translation table on upgrade. It is not a general model-translation API or a reason to copy its design.
 
 These are **pre-foundation and still-relevant integration** facts, not a claim that request selection or model translations use the new registry. Relevant sources: `config/app.php`, `packages/Webkul/Core/src/Core.php`, `packages/Webkul/Core/src/SystemConfig.php`, `packages/Webkul/Admin/src/Config/core_config.php`, `packages/Webkul/Admin/src/Http/Middleware/Locale.php`, `packages/Webkul/Student/src/Providers/StudentServiceProvider.php`, `packages/Webkul/Shop/src/Providers/ShopServiceProvider.php`, `packages/Webkul/Installer/src/Http/Middleware/Locale.php`, and the Shop migrations above.
@@ -43,7 +43,7 @@ Step 02 separates two authorities: the Admin interface locale remains `general.g
 
 A content-write locale MUST be selected explicitly from active content locales; it MUST NOT be inferred from the Admin UI locale. A locale becoming inactive retains its identity and existing translation rows, which simply cease to be selectable for new content writes. Adding or activating a content locale neither translates Admin UI strings nor creates missing package static resources. Machine identifiers remain independent of language.
 
-CampusHub has no verified Channel equivalent or separate campus/site locale administration. The content language set is global and ordered by `LocaleRepository::activeOrdered()` through `ContentLocaleService::activeContentLocales()`; future content forms must use this set and explicitly record the selected locale. Propose surface-specific availability only after a concrete requirement. Do not silently choose the first locale in a collection. Static `app.fallback_locale` need not equal a database content locale.
+Laraseed has no verified Channel equivalent or separate campus/site locale administration. The content language set is global and ordered by `LocaleRepository::activeOrdered()` through `ContentLocaleService::activeContentLocales()`; future content forms must use this set and explicitly record the selected locale. Propose surface-specific availability only after a concrete requirement. Do not silently choose the first locale in a collection. Static `app.fallback_locale` need not equal a database content locale.
 
 Current selection and intended future resolution are distinct:
 

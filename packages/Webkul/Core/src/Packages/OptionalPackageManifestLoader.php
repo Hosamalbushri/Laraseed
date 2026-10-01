@@ -28,10 +28,10 @@ class OptionalPackageManifestLoader
 
         foreach ($manifestPaths as $path) {
             $manifest = $this->readManifest($path);
-            $metadata = $manifest['extra']['campushub'] ?? null;
+            $metadata = $manifest['extra']['laraseed'] ?? null;
 
             if (! is_array($metadata)) {
-                throw new InvalidPackageComposition("Optional package manifest [{$path}] is missing extra.campushub metadata.");
+                throw new InvalidPackageComposition("Optional package manifest [{$path}] is missing extra.laraseed metadata.");
             }
 
             $id = $metadata['id'] ?? null;
@@ -44,7 +44,7 @@ class OptionalPackageManifestLoader
             }
 
             if (($metadata['type'] ?? null) !== 'optional') {
-                throw new InvalidPackageComposition("Package [{$id}] must declare extra.campushub.type as optional.");
+                throw new InvalidPackageComposition("Package [{$id}] must declare extra.laraseed.type as optional.");
             }
 
             if (isset($packages[$id])) {
@@ -79,7 +79,7 @@ class OptionalPackageManifestLoader
 
         foreach ($manifestPaths as $path) {
             $manifest = $this->readManifest($path);
-            $id = $manifest['extra']['campushub']['id'];
+            $id = $manifest['extra']['laraseed']['id'];
             $requirements = array_keys($manifest['require'] ?? []);
 
             $packages[$id]['requires'] = array_values(array_map(

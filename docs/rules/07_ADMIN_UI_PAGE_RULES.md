@@ -1,4 +1,4 @@
-# CampusHub Admin UI Page Rules
+# Laraseed Admin UI Page Rules
 
 > **Mandatory Admin presentation standard.** These rules govern pages rendered in the Admin control-panel shell, whether the page belongs to Foundation or to an optional package. Rendering in Admin does not transfer feature ownership to `Webkul\Admin`.
 

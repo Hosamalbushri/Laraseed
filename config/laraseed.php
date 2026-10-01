@@ -28,7 +28,10 @@ return [
     'optional_packages' => [
         'enabled' => $composition->enabledPackages(),
         'catalog' => $composition->packages(),
-        'providers' => $composition->providers(),
+        'providers' => array_values(array_unique(array_merge(
+            $composition->providers(),
+            $composition->capabilityProviders('web'),
+        ))),
         'concord_modules' => $composition->concordModules(),
         'dependencies' => $composition->dependencyGraph(),
     ],

@@ -19,9 +19,11 @@ use Laraseed\PackageGenerator\Console\Commands\RepositoryMakeCommand;
 use Laraseed\PackageGenerator\Console\Commands\RequestMakeCommand;
 use Laraseed\PackageGenerator\Console\Commands\RouteMakeCommand;
 use Laraseed\PackageGenerator\Console\Commands\SeederMakeCommand;
+use Laraseed\PackageGenerator\Console\Commands\WebMakeCommand;
 use Laraseed\PackageGenerator\Generators\FilesystemWriter;
 use Laraseed\PackageGenerator\Generators\PackageGenerator;
 use Laraseed\PackageGenerator\Generators\StubRenderer;
+use Laraseed\PackageGenerator\Generators\WebGenerator;
 
 class PackageGeneratorServiceProvider extends ServiceProvider
 {
@@ -32,6 +34,15 @@ class PackageGeneratorServiceProvider extends ServiceProvider
     {
         $this->app->singleton(PackageGenerator::class, function ($app) {
             return new PackageGenerator(
+                new StubRenderer,
+                new FilesystemWriter,
+                $app->basePath()
+            );
+        });
+
+        $this->app->singleton(WebGenerator::class, function ($app) {
+            return new WebGenerator(
+                $app->make(\Laraseed\PackageGenerator\Support\PackageResolver::class),
                 new StubRenderer,
                 new FilesystemWriter,
                 $app->basePath()
@@ -62,6 +73,7 @@ class PackageGeneratorServiceProvider extends ServiceProvider
                 SeederMakeCommand::class,
                 DataGridMakeCommand::class,
                 AdminMakeCommand::class,
+                WebMakeCommand::class,
             ]);
         }
     }

@@ -1,0 +1,22 @@
+<?php
+
+namespace {{ NAMESPACE }}\Web\Http\Controllers;
+
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
+
+class HomeController extends Controller
+{
+    public function index(Request $request): View
+    {
+        if ($request->has('locale') && in_array($request->query('locale'), ['en', 'ar'])) {
+            app()->setLocale($request->query('locale'));
+            session(['locale' => $request->query('locale')]);
+        } elseif (session()->has('locale')) {
+            app()->setLocale(session('locale'));
+        }
+
+        return view('{{ PACKAGE_KEY }}_web::home.index');
+    }
+}

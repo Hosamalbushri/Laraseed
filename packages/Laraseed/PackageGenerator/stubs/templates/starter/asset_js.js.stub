@@ -1,0 +1,27 @@
+import { createApp } from "vue/dist/vue.esm-bundler";
+
+const app = createApp({
+    data() {
+        return {
+            isDarkMode: document.documentElement.classList.contains('dark'),
+        };
+    },
+    methods: {
+        toggleDarkMode() {
+            this.isDarkMode = !this.isDarkMode;
+            document.documentElement.classList.toggle('dark', this.isDarkMode);
+            document.cookie = 'dark_mode=' + (this.isDarkMode ? '1' : '0') + '; path=/; max-age=31536000';
+        }
+    }
+});
+
+window.app = app;
+
+window.addEventListener('load', () => {
+    const el = document.getElementById('app');
+    if (el) {
+        app.mount('#app');
+    }
+});
+
+export default app;

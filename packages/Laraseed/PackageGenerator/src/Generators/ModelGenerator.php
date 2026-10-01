@@ -1,0 +1,80 @@
+<?php
+
+namespace Laraseed\PackageGenerator\Generators;
+
+use Laraseed\PackageGenerator\Exceptions\PackageGenerationException;
+use Laraseed\PackageGenerator\Support\PackageResolver;
+use Laraseed\PackageGenerator\Support\ResolvedPackage;
+
+class ModelGenerator
+{
+    protected string $basePath;
+
+    public function __construct(
+        protected PackageResolver $resolver = new PackageResolver,
+        protected StubRenderer $renderer = new StubRenderer,
+        protected FilesystemWriter $writer = new FilesystemWriter,
+        ?string $basePath = null
+    ) {
+        $this->basePath = $basePath ?? base_path();
+        $this->resolver = new PackageResolver(basePath: $this->basePath);
+    }
+
+    /**
+     * Generate an Eloquent model for the specified package.
+     *
+     * @return array{
+     *     package: ResolvedPackage,
+     *     model: string,
+     *     dry_run: bool,
+     *     force: bool,
+     *     files: array<int, array{path: string, full_path: string, action: string, bytes: int}>
+     * }
+     */
+    public function generate(string $packageInput, string $modelName, bool $dryRun = false, bool $force = false): array
+    {
+        $resolved = $this->resolver->resolve($packageInput);
+        $this->validateModelName($modelName);
+
+        $stub = "<?php\n\nnamespace {{ NAMESPACE }}\\Models;\n\nuse Illuminate\\Database\\Eloquent\\Model;\n\nclass {{ CLASS_NAME }} extends Model\n{\n    /**\n     * The attributes that are mass assignable.\n     *\n     * @var array<int, string>\n     */\n    protected \$fillable = [\n    ];\n}\n";
+
+        $content = str_replace(
+            ['{{ NAMESPACE }}', '{{ CLASS_NAME }}'],
+            [$resolved->namespace, $modelName],
+            $stub
+        );
+
+        $relativePath = "src/Models/{$modelName}.php";
+        $files = [$relativePath => $content];
+
+        $plan = new GenerationPlan($resolved->identity->relativePackagePath, $this->basePath, $files);
+        $plan->preflight($force);
+
+        $results = $this->writer->execute($plan, $dryRun, $force);
+
+        return [
+            'package' => $resolved,
+            'model' => $modelName,
+            'dry_run' => $dryRun,
+            'force' => $force,
+            'files' => $results,
+        ];
+    }
+
+    protected function validateModelName(string $name): void
+    {
+        $trimmed = trim($name);
+
+        if ($trimmed === '') {
+            throw PackageGenerationException::invalidInput('Model class name cannot be empty.');
+        }
+
+        if (str_contains($trimmed, '..') || str_contains($trimmed, '/') || str_contains($trimmed, '\\') || str_contains($trimmed, "\0")) {
+            throw PackageGenerationException::invalidInput('Model class name contains path traversal or invalid path characters.');
+        }
+
+        if (preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/', $trimmed) !== 1) {
+            throw PackageGenerationException::invalidInput("Model class name [{$trimmed}] must be a valid PHP class identifier.");
+        }
+    }
+}

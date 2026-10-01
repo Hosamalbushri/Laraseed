@@ -15,6 +15,7 @@ use Webkul\Admin\Helpers\MegaSearch;
 use Webkul\Admin\Http\Middleware\Bouncer as BouncerMiddleware;
 use Webkul\Admin\Http\Middleware\Locale;
 use Webkul\Core\Contracts\AuthenticationRedirectResolver;
+use Webkul\Core\Packages\OptionalPackageComposition;
 
 class AdminServiceProvider extends ServiceProvider
 {
@@ -67,6 +68,8 @@ class AdminServiceProvider extends ServiceProvider
 
         $this->registerConfig();
 
+        $this->registerCapabilityProviders();
+
         $this->app->singleton(DashboardStatsRegistry::class);
 
         $this->app->singleton(MegaSearch::class, function () {
@@ -77,6 +80,24 @@ class AdminServiceProvider extends ServiceProvider
 
             return $megaSearch;
         });
+    }
+
+    /**
+     * Register active Admin capability providers from composed optional packages.
+     */
+    protected function registerCapabilityProviders(): void
+    {
+        if ($this->app->bound(OptionalPackageComposition::class)) {
+            $composition = $this->app->make(OptionalPackageComposition::class);
+        } else {
+            $catalog = config('laraseed.optional_packages.catalog', []);
+            $enabled = config('laraseed.optional_packages.enabled', []);
+            $composition = new OptionalPackageComposition($catalog, $enabled);
+        }
+
+        foreach ($composition->capabilityProviders('admin') as $provider) {
+            $this->app->register($provider);
+        }
     }
 
     /**

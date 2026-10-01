@@ -73,6 +73,10 @@ class CoreConfigRepository extends Repository
     {
         $results = [];
 
+        if (trim($searchTerm) === '') {
+            return $results;
+        }
+
         foreach ($items as $configuration) {
             $title = $this->getTranslatedTitle($configuration);
 
@@ -190,23 +194,10 @@ class CoreConfigRepository extends Repository
      */
     public function recursiveArray(array $formData, string $method): array
     {
-        static $data = [];
+        $data = [];
+        $this->flattenFormData($formData, $method, $data);
 
-        static $recursiveArrayData = [];
-
-        foreach ($formData as $form => $formValue) {
-            $value = $method.'.'.$form;
-
-            if (is_array($formValue)) {
-                $dim = $this->countDim($formValue);
-
-                if ($dim > 1) {
-                    $this->recursiveArray($formValue, $value);
-                } elseif ($dim == 1) {
-                    $data[$value] = $formValue;
-                }
-            }
-        }
+        $recursiveArrayData = [];
 
         foreach ($data as $key => $value) {
             $field = core()->getConfigField($key);
@@ -221,6 +212,26 @@ class CoreConfigRepository extends Repository
         }
 
         return $recursiveArrayData;
+    }
+
+    /**
+     * Flatten form data into dot-notated group keys without cross-invocation static state.
+     */
+    protected function flattenFormData(array $formData, string $method, array &$data): void
+    {
+        foreach ($formData as $form => $formValue) {
+            $value = $method.'.'.$form;
+
+            if (is_array($formValue)) {
+                $dim = $this->countDim($formValue);
+
+                if ($dim > 1) {
+                    $this->flattenFormData($formValue, $value, $data);
+                } elseif ($dim == 1) {
+                    $data[$value] = $formValue;
+                }
+            }
+        }
     }
 
     /**

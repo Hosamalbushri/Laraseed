@@ -30,6 +30,10 @@ class ConfigurationController extends Controller
             request()->route('slug')
             && request()->route('slug2')
         ) {
+            if (! system_config()->getActiveConfigurationItem()) {
+                abort(404);
+            }
+
             return view('admin::configuration.edit');
         }
 
@@ -59,11 +63,19 @@ class ConfigurationController extends Controller
      */
     public function download()
     {
-        $path = request()->route()->parameters()['path'];
+        $path = request()->route()->parameters()['path'] ?? null;
+
+        if (! $path) {
+            abort(404);
+        }
 
         $fileName = 'configuration/'.$path;
 
         $config = $this->configurationRepository->findOneByField('value', $fileName);
+
+        if (! $config || ! Storage::exists($config['value'])) {
+            abort(404);
+        }
 
         return Storage::download($config['value']);
     }

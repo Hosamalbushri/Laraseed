@@ -48,11 +48,19 @@ class PackageDiagnosticsCommand extends Command
             $status = ($isEnabled && $isProviderLoaded) ? 'ACTIVE' : 'DISABLED';
             $requires = empty($metadata['requires']) ? '-' : implode(', ', $metadata['requires']);
 
+            $caps = [];
+            foreach (($metadata['capabilities'] ?? []) as $capName => $capDef) {
+                $capEnabled = ($capDef['enabled'] ?? true) ? 'ON' : 'OFF';
+                $caps[] = "{$capName}:{$capEnabled}";
+            }
+            $capabilitiesStr = $caps === [] ? '-' : implode(', ', $caps);
+
             $rows[] = [
                 $displayName,
                 $id,
                 $isInstalled ? 'YES' : 'NO',
                 $isEnabled ? 'YES' : 'NO',
+                $capabilitiesStr,
                 $providerState,
                 $requires,
                 $status,
@@ -60,7 +68,7 @@ class PackageDiagnosticsCommand extends Command
         }
 
         $this->table(
-            ['Package', 'ID', 'Installed', 'Enabled', 'Provider', 'Requires', 'Status'],
+            ['Package', 'ID', 'Installed', 'Enabled', 'Capabilities', 'Provider', 'Requires', 'Status'],
             $rows,
         );
 

@@ -18,6 +18,10 @@
         <testsuite name="Composition">
             <directory suffix="Test.php">./tests/Composition</directory>
         </testsuite>
+
+        <testsuite name="Packages">
+            <directory suffix="Test.php">./packages</directory>
+        </testsuite>
     </testsuites>
 
     <source>
@@ -36,5 +40,6 @@
         <env name="QUEUE_CONNECTION" value="sync" />
         <env name="SESSION_DRIVER" value="array" />
         <env name="TELESCOPE_ENABLED" value="false" />
+        <env name="LARASEED_OPTIONAL_PACKAGES" value="" />
     </php>
 </phpunit>

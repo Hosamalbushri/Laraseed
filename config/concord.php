@@ -5,7 +5,7 @@ use Webkul\Core\Providers\ModuleServiceProvider as CoreModuleServiceProvider;
 use Webkul\DataGrid\Providers\ModuleServiceProvider as DataGridModuleServiceProvider;
 use Webkul\User\Providers\ModuleServiceProvider as UserModuleServiceProvider;
 
-$optionalModules = config('laraseed.optional_packages.concord_modules', []);
+$optionalModules = (require __DIR__.'/laraseed.php')['optional_packages']['concord_modules'] ?? [];
 
 return [
     'modules' => [

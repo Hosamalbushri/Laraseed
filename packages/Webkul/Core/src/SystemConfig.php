@@ -48,13 +48,9 @@ class SystemConfig
      */
     private function retrieveCoreConfig(): array
     {
-        static $items;
+        $items = config('core_config');
 
-        if ($items) {
-            return $items;
-        }
-
-        return $items = config('core_config');
+        return is_array($items) ? $items : [];
     }
 
     /**
@@ -62,15 +58,22 @@ class SystemConfig
      */
     public function prepareConfigurationItems()
     {
+        $this->items = [];
         $configWithDotNotation = [];
 
         foreach ($this->retrieveCoreConfig() as $item) {
-            $configWithDotNotation[$item['key']] = $item;
+            if (isset($item['key'])) {
+                $configWithDotNotation[$item['key']] = $item;
+            }
         }
 
         $configs = Arr::undot(Arr::dot($configWithDotNotation));
 
         foreach ($configs as $configItem) {
+            if (! isset($configItem['key'])) {
+                continue;
+            }
+
             $subConfigItems = $this->processSubConfigItems($configItem);
 
             $this->addItem(new Item(
@@ -78,10 +81,10 @@ class SystemConfig
                 fields: $configItem['fields'] ?? null,
                 icon: $configItem['icon'] ?? null,
                 key: $configItem['key'],
-                name: trans($configItem['name']),
+                name: isset($configItem['name']) ? trans($configItem['name']) : '',
                 route: $configItem['route'] ?? null,
-                info: trans($configItem['info']) ?? null,
-                sort: $configItem['sort'],
+                info: isset($configItem['info']) ? trans($configItem['info']) : null,
+                sort: $configItem['sort'] ?? null,
             ));
         }
     }
@@ -102,8 +105,8 @@ class SystemConfig
                     fields: $subConfigItem['fields'] ?? null,
                     icon: $subConfigItem['icon'] ?? null,
                     key: $subConfigItem['key'],
-                    name: trans($subConfigItem['name']),
-                    info: trans($subConfigItem['info']) ?? null,
+                    name: isset($subConfigItem['name']) ? trans($subConfigItem['name']) : '',
+                    info: isset($subConfigItem['info']) ? trans($subConfigItem['info']) : null,
                     route: $subConfigItem['route'] ?? null,
                     sort: $subConfigItem['sort'] ?? null,
                 );
@@ -126,7 +129,9 @@ class SystemConfig
         }
 
         if ($slug2 = request()->route('slug2')) {
-            $activeItem = $activeItem->getChildren()[$slug2];
+            $children = $activeItem->getChildren();
+
+            $activeItem = $children->has($slug2) ? $children->get($slug2) : ($children[$slug2] ?? null);
         }
 
         return $activeItem;

@@ -184,3 +184,437 @@ it('verifies that Foundation-only route composition contains zero deleted packag
             ->not->toContain('Webkul\\Web');
     }
 });
+
+it('loads V1 manifests without capabilities as an empty capabilities array', function () {
+    $manifest = [
+        'name' => 'laraseed/legacy-pkg',
+        'extra' => [
+            'laraseed' => [
+                'id' => 'legacy_pkg',
+                'type' => 'optional',
+                'provider' => CoreServiceProvider::class,
+            ],
+        ],
+    ];
+
+    $path = tempnam(sys_get_temp_dir(), 'laraseed-test-manifest-');
+    file_put_contents($path, json_encode($manifest, JSON_THROW_ON_ERROR));
+
+    try {
+        $catalog = (new OptionalPackageManifestLoader)->load([$path]);
+        expect($catalog['legacy_pkg']['capabilities'])->toBe([]);
+    } finally {
+        @unlink($path);
+    }
+});
+
+it('loads manifests with valid empty, single, and multiple capabilities', function () {
+    $manifest = [
+        'name' => 'laraseed/multi-cap-pkg',
+        'extra' => [
+            'laraseed' => [
+                'id' => 'multi_cap_pkg',
+                'type' => 'optional',
+                'provider' => CoreServiceProvider::class,
+                'capabilities' => [
+                    'admin' => [
+                        'provider' => UserServiceProvider::class,
+                        'enabled' => true,
+                    ],
+                    'api' => [
+                        'provider' => CoreServiceProvider::class,
+                        'enabled' => false,
+                    ],
+                    'reporting_v2' => [
+                        'provider' => UserServiceProvider::class,
+                    ],
+                ],
+            ],
+        ],
+    ];
+
+    $path = tempnam(sys_get_temp_dir(), 'laraseed-test-manifest-');
+    file_put_contents($path, json_encode($manifest, JSON_THROW_ON_ERROR));
+
+    try {
+        $catalog = (new OptionalPackageManifestLoader)->load([$path]);
+        expect($catalog['multi_cap_pkg']['capabilities'])->toBe([
+            'admin' => [
+                'provider' => UserServiceProvider::class,
+                'enabled' => true,
+            ],
+            'api' => [
+                'provider' => CoreServiceProvider::class,
+                'enabled' => false,
+            ],
+            'reporting_v2' => [
+                'provider' => UserServiceProvider::class,
+                'enabled' => true,
+            ],
+        ]);
+    } finally {
+        @unlink($path);
+    }
+});
+
+it('rejects invalid capability container formats', function (mixed $invalidCapabilities) {
+    $manifest = [
+        'name' => 'laraseed/invalid-container-pkg',
+        'extra' => [
+            'laraseed' => [
+                'id' => 'invalid_container_pkg',
+                'type' => 'optional',
+                'provider' => CoreServiceProvider::class,
+                'capabilities' => $invalidCapabilities,
+            ],
+        ],
+    ];
+
+    $path = tempnam(sys_get_temp_dir(), 'laraseed-test-manifest-');
+    file_put_contents($path, json_encode($manifest, JSON_THROW_ON_ERROR));
+
+    try {
+        expect(fn () => (new OptionalPackageManifestLoader)->load([$path]))
+            ->toThrow(InvalidPackageComposition::class, 'Optional package [invalid_container_pkg] declares an invalid capabilities definition.');
+    } finally {
+        @unlink($path);
+    }
+})->with([
+    'string' => ['invalid_string'],
+    'integer' => [12345],
+    'boolean' => [true],
+]);
+
+it('rejects invalid capability names', function (string $invalidName) {
+    $manifest = [
+        'name' => 'laraseed/invalid-name-pkg',
+        'extra' => [
+            'laraseed' => [
+                'id' => 'invalid_name_pkg',
+                'type' => 'optional',
+                'provider' => CoreServiceProvider::class,
+                'capabilities' => [
+                    $invalidName => [
+                        'provider' => UserServiceProvider::class,
+                    ],
+                ],
+            ],
+        ],
+    ];
+
+    $path = tempnam(sys_get_temp_dir(), 'laraseed-test-manifest-');
+    file_put_contents($path, json_encode($manifest, JSON_THROW_ON_ERROR));
+
+    try {
+        expect(fn () => (new OptionalPackageManifestLoader)->load([$path]))
+            ->toThrow(InvalidPackageComposition::class, "Optional package [invalid_name_pkg] declares an invalid capability name [{$invalidName}].");
+    } finally {
+        @unlink($path);
+    }
+})->with([
+    'uppercase' => ['Admin'],
+    'kebab-case' => ['admin-ui'],
+    'path traversal' => ['../admin'],
+    'slash separator' => ['admin/provider'],
+    'leading underscore' => ['_admin'],
+    'leading digit' => ['1admin'],
+    'dot notation' => ['admin.ui'],
+]);
+
+it('rejects malformed capability definitions', function (mixed $definition, string $expectedMessage) {
+    $manifest = [
+        'name' => 'laraseed/malformed-def-pkg',
+        'extra' => [
+            'laraseed' => [
+                'id' => 'malformed_def_pkg',
+                'type' => 'optional',
+                'provider' => CoreServiceProvider::class,
+                'capabilities' => [
+                    'admin' => $definition,
+                ],
+            ],
+        ],
+    ];
+
+    $path = tempnam(sys_get_temp_dir(), 'laraseed-test-manifest-');
+    file_put_contents($path, json_encode($manifest, JSON_THROW_ON_ERROR));
+
+    try {
+        expect(fn () => (new OptionalPackageManifestLoader)->load([$path]))
+            ->toThrow(InvalidPackageComposition::class, $expectedMessage);
+    } finally {
+        @unlink($path);
+    }
+})->with([
+    'non-array definition' => ['just_a_string', 'Optional package [malformed_def_pkg] capability [admin] must be an object definition.'],
+    'missing provider' => [['enabled' => true], 'Optional package [malformed_def_pkg] capability [admin] declares an invalid provider class.'],
+    'provider not string' => [['provider' => 12345], 'Optional package [malformed_def_pkg] capability [admin] declares an invalid provider class.'],
+    'empty provider string' => [['provider' => ''], 'Optional package [malformed_def_pkg] capability [admin] declares an invalid provider class.'],
+    'non-existent class' => [['provider' => 'NonExistent\\Admin\\Provider'], 'Optional package [malformed_def_pkg] capability [admin] declares an invalid provider class.'],
+    'non-ServiceProvider class' => [['provider' => stdClass::class], 'Optional package [malformed_def_pkg] capability [admin] declares an invalid provider class.'],
+]);
+
+it('rejects unknown fields in capability definitions', function () {
+    $manifest = [
+        'name' => 'laraseed/unknown-field-pkg',
+        'extra' => [
+            'laraseed' => [
+                'id' => 'unknown_field_pkg',
+                'type' => 'optional',
+                'provider' => CoreServiceProvider::class,
+                'capabilities' => [
+                    'admin' => [
+                        'provider' => UserServiceProvider::class,
+                        'enabled' => true,
+                        'middleware' => ['web', 'admin'],
+                    ],
+                ],
+            ],
+        ],
+    ];
+
+    $path = tempnam(sys_get_temp_dir(), 'laraseed-test-manifest-');
+    file_put_contents($path, json_encode($manifest, JSON_THROW_ON_ERROR));
+
+    try {
+        expect(fn () => (new OptionalPackageManifestLoader)->load([$path]))
+            ->toThrow(InvalidPackageComposition::class, 'Optional package [unknown_field_pkg] capability [admin] contains unknown field [middleware].');
+    } finally {
+        @unlink($path);
+    }
+});
+
+it('rejects non-boolean enabled flags in capability definitions', function () {
+    $manifest = [
+        'name' => 'laraseed/invalid-enabled-pkg',
+        'extra' => [
+            'laraseed' => [
+                'id' => 'invalid_enabled_pkg',
+                'type' => 'optional',
+                'provider' => CoreServiceProvider::class,
+                'capabilities' => [
+                    'admin' => [
+                        'provider' => UserServiceProvider::class,
+                        'enabled' => 'yes',
+                    ],
+                ],
+            ],
+        ],
+    ];
+
+    $path = tempnam(sys_get_temp_dir(), 'laraseed-test-manifest-');
+    file_put_contents($path, json_encode($manifest, JSON_THROW_ON_ERROR));
+
+    try {
+        expect(fn () => (new OptionalPackageManifestLoader)->load([$path]))
+            ->toThrow(InvalidPackageComposition::class, 'Optional package [invalid_enabled_pkg] capability [admin] declares an invalid enabled flag.');
+    } finally {
+        @unlink($path);
+    }
+});
+
+it('inspects package capabilities via hasCapability, capability, and capabilities', function () {
+    $catalog = [
+        'blog' => [
+            'id' => 'blog',
+            'composer_name' => 'laraseed/blog',
+            'provider' => CoreServiceProvider::class,
+            'concord_module' => null,
+            'capabilities' => [
+                'admin' => [
+                    'provider' => UserServiceProvider::class,
+                    'enabled' => true,
+                ],
+                'api' => [
+                    'provider' => CoreServiceProvider::class,
+                    'enabled' => false,
+                ],
+            ],
+            'requires' => [],
+        ],
+    ];
+
+    $composition = new OptionalPackageComposition($catalog, ['blog']);
+
+    expect($composition->hasCapability('blog', 'admin'))->toBeTrue()
+        ->and($composition->hasCapability('blog', 'api'))->toBeTrue()
+        ->and($composition->hasCapability('blog', 'cli'))->toBeFalse()
+        ->and($composition->capability('blog', 'admin'))->toBe([
+            'provider' => UserServiceProvider::class,
+            'enabled' => true,
+        ])
+        ->and($composition->capability('blog', 'api'))->toBe([
+            'provider' => CoreServiceProvider::class,
+            'enabled' => false,
+        ])
+        ->and($composition->capability('blog', 'cli'))->toBeNull()
+        ->and($composition->capabilities('blog'))->toBe([
+            'admin' => [
+                'provider' => UserServiceProvider::class,
+                'enabled' => true,
+            ],
+            'api' => [
+                'provider' => CoreServiceProvider::class,
+                'enabled' => false,
+            ],
+        ]);
+});
+
+it('evaluates capabilityProviders across all four package and capability enablement quadrants', function () {
+    $catalog = [
+        'pkg_on_cap_on' => [
+            'id' => 'pkg_on_cap_on',
+            'composer_name' => 'laraseed/pkg-on-cap-on',
+            'provider' => CoreServiceProvider::class,
+            'concord_module' => null,
+            'capabilities' => [
+                'admin' => [
+                    'provider' => UserServiceProvider::class,
+                    'enabled' => true,
+                ],
+            ],
+            'requires' => [],
+        ],
+        'pkg_on_cap_off' => [
+            'id' => 'pkg_on_cap_off',
+            'composer_name' => 'laraseed/pkg-on-cap-off',
+            'provider' => CoreServiceProvider::class,
+            'concord_module' => null,
+            'capabilities' => [
+                'admin' => [
+                    'provider' => UserServiceProvider::class,
+                    'enabled' => false,
+                ],
+            ],
+            'requires' => [],
+        ],
+        'pkg_off_cap_on' => [
+            'id' => 'pkg_off_cap_on',
+            'composer_name' => 'laraseed/pkg-off-cap-on',
+            'provider' => CoreServiceProvider::class,
+            'concord_module' => null,
+            'capabilities' => [
+                'admin' => [
+                    'provider' => UserServiceProvider::class,
+                    'enabled' => true,
+                ],
+            ],
+            'requires' => [],
+        ],
+        'pkg_off_cap_off' => [
+            'id' => 'pkg_off_cap_off',
+            'composer_name' => 'laraseed/pkg-off-cap-off',
+            'provider' => CoreServiceProvider::class,
+            'concord_module' => null,
+            'capabilities' => [
+                'admin' => [
+                    'provider' => UserServiceProvider::class,
+                    'enabled' => false,
+                ],
+            ],
+            'requires' => [],
+        ],
+    ];
+
+    // Enable only pkg_on_cap_on and pkg_on_cap_off
+    $composition = new OptionalPackageComposition($catalog, ['pkg_on_cap_on', 'pkg_on_cap_off']);
+
+    // Declared capability exists for all 4
+    expect($composition->hasCapability('pkg_on_cap_on', 'admin'))->toBeTrue()
+        ->and($composition->hasCapability('pkg_on_cap_off', 'admin'))->toBeTrue()
+        ->and($composition->hasCapability('pkg_off_cap_on', 'admin'))->toBeTrue()
+        ->and($composition->hasCapability('pkg_off_cap_off', 'admin'))->toBeTrue();
+
+    // Active capability providers only contains provider from pkg_on_cap_on
+    expect($composition->capabilityProviders('admin'))->toBe([
+        UserServiceProvider::class,
+    ]);
+});
+
+it('returns capabilityProviders in deterministic topological dependency order', function () {
+    $catalog = [
+        'base_pkg' => [
+            'id' => 'base_pkg',
+            'composer_name' => 'laraseed/base-pkg',
+            'provider' => CoreServiceProvider::class,
+            'concord_module' => null,
+            'capabilities' => [
+                'admin' => [
+                    'provider' => CoreServiceProvider::class,
+                    'enabled' => true,
+                ],
+            ],
+            'requires' => [],
+        ],
+        'child_pkg' => [
+            'id' => 'child_pkg',
+            'composer_name' => 'laraseed/child-pkg',
+            'provider' => UserServiceProvider::class,
+            'concord_module' => null,
+            'capabilities' => [
+                'admin' => [
+                    'provider' => UserServiceProvider::class,
+                    'enabled' => true,
+                ],
+            ],
+            'requires' => ['base_pkg'],
+        ],
+    ];
+
+    // Pass in reverse order to test topological sorting
+    $composition = new OptionalPackageComposition($catalog, ['child_pkg', 'base_pkg']);
+
+    expect($composition->capabilityProviders('admin'))->toBe([
+        CoreServiceProvider::class,
+        UserServiceProvider::class,
+    ]);
+});
+
+it('deduplicates capability providers while preserving first dependency order', function () {
+    $catalog = [
+        'pkg_a' => [
+            'id' => 'pkg_a',
+            'composer_name' => 'laraseed/pkg-a',
+            'provider' => CoreServiceProvider::class,
+            'concord_module' => null,
+            'capabilities' => [
+                'admin' => [
+                    'provider' => UserServiceProvider::class,
+                    'enabled' => true,
+                ],
+            ],
+            'requires' => [],
+        ],
+        'pkg_b' => [
+            'id' => 'pkg_b',
+            'composer_name' => 'laraseed/pkg-b',
+            'provider' => CoreServiceProvider::class,
+            'concord_module' => null,
+            'capabilities' => [
+                'admin' => [
+                    'provider' => UserServiceProvider::class,
+                    'enabled' => true,
+                ],
+            ],
+            'requires' => ['pkg_a'],
+        ],
+    ];
+
+    $composition = new OptionalPackageComposition($catalog, ['pkg_a', 'pkg_b']);
+
+    // UserServiceProvider declared in both pkg_a and pkg_b -> deduplicated to 1 item
+    expect($composition->capabilityProviders('admin'))->toBe([
+        UserServiceProvider::class,
+    ]);
+});
+
+it('throws InvalidPackageComposition when querying capabilities on an unknown package', function () {
+    $composition = new OptionalPackageComposition(sampleSyntheticPackageCatalog(), ['base_addon']);
+
+    expect(fn () => $composition->hasCapability('non_existent', 'admin'))
+        ->toThrow(InvalidPackageComposition::class, 'Unknown Optional package ID [non_existent].')
+        ->and(fn () => $composition->capability('non_existent', 'admin'))
+        ->toThrow(InvalidPackageComposition::class, 'Unknown Optional package ID [non_existent].')
+        ->and(fn () => $composition->capabilities('non_existent'))
+        ->toThrow(InvalidPackageComposition::class, 'Unknown Optional package ID [non_existent].');
+});

@@ -4,6 +4,31 @@ use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 use Webkul\User\Models\User;
 
+spl_autoload_register(function (string $class): void {
+    $parts = explode('\\', $class);
+    if (count($parts) >= 2) {
+        $vendor = $parts[0];
+        $package = $parts[1];
+        $baseDir = dirname(__DIR__) . "/packages/{$vendor}/{$package}";
+        if (is_dir($baseDir)) {
+            $relative = implode('/', array_slice($parts, 2));
+            $srcFile = "{$baseDir}/src/{$relative}.php";
+            if (file_exists($srcFile)) {
+                require_once $srcFile;
+                return;
+            }
+            if (isset($parts[2]) && $parts[2] === 'Tests') {
+                $testRelative = implode('/', array_slice($parts, 3));
+                $testFile = "{$baseDir}/tests/{$testRelative}.php";
+                if (file_exists($testFile)) {
+                    require_once $testFile;
+                    return;
+                }
+            }
+        }
+    }
+});
+
 /*
 |--------------------------------------------------------------------------
 | Test Case

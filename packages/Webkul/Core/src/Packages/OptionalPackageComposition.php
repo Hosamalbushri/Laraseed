@@ -12,18 +12,35 @@ class OptionalPackageComposition
     protected array $enabled;
 
     /**
-     * @param  array<string, array{id: string, composer_name: string, provider: string, concord_module: string|null, requires: list<string>}>  $packages
+     * @param  array<string, array{
+     *     id: string,
+     *     composer_name: string,
+     *     provider: string,
+     *     concord_module: string|null,
+     *     capabilities?: array<string, array{provider: string, enabled: bool}>,
+     *     requires: list<string>
+     * }>  $packages
      * @param  list<string>  $enabled
      */
     public function __construct(
         protected array $packages,
         array $enabled,
     ) {
+        $this->normalizeCapabilities();
         $this->assertKnownPackages($enabled);
         $this->assertAcyclic();
         $this->assertEnabledDependencies($enabled);
 
         $this->enabled = $this->sortByDependencies(array_values(array_unique($enabled)));
+    }
+
+    protected function normalizeCapabilities(): void
+    {
+        foreach ($this->packages as $id => $data) {
+            if (! isset($this->packages[$id]['capabilities']) || ! is_array($this->packages[$id]['capabilities'])) {
+                $this->packages[$id]['capabilities'] = [];
+            }
+        }
     }
 
     /**
@@ -79,6 +96,60 @@ class OptionalPackageComposition
     }
 
     /**
+     * Determine if a package declares a specific capability.
+     */
+    public function hasCapability(string $packageId, string $capability): bool
+    {
+        $this->assertKnownPackages([$packageId]);
+
+        return isset($this->packages[$packageId]['capabilities'][$capability]);
+    }
+
+    /**
+     * Get the declared capability configuration for a package, or null if undeclared.
+     *
+     * @return array{provider: string, enabled: bool}|null
+     */
+    public function capability(string $packageId, string $capability): ?array
+    {
+        $this->assertKnownPackages([$packageId]);
+
+        return $this->packages[$packageId]['capabilities'][$capability] ?? null;
+    }
+
+    /**
+     * Get all declared capabilities for a package.
+     *
+     * @return array<string, array{provider: string, enabled: bool}>
+     */
+    public function capabilities(string $packageId): array
+    {
+        $this->assertKnownPackages([$packageId]);
+
+        return $this->packages[$packageId]['capabilities'] ?? [];
+    }
+
+    /**
+     * Get active capability providers for all enabled packages in deterministic dependency order.
+     *
+     * @return list<string>
+     */
+    public function capabilityProviders(string $capability): array
+    {
+        $providers = [];
+
+        foreach ($this->enabled as $packageId) {
+            $cap = $this->packages[$packageId]['capabilities'][$capability] ?? null;
+
+            if ($cap !== null && ($cap['enabled'] ?? true) === true) {
+                $providers[] = $cap['provider'];
+            }
+        }
+
+        return array_values(array_unique($providers));
+    }
+
+    /**
      * @return array<string, list<string>>
      */
     public function dependencyGraph(): array
@@ -108,7 +179,7 @@ class OptionalPackageComposition
     }
 
     /**
-     * @return array<string, array{id: string, composer_name: string, provider: string, concord_module: string|null, requires: list<string>}>
+     * @return array<string, array{id: string, composer_name: string, provider: string, concord_module: string|null, capabilities: array<string, array{provider: string, enabled: bool}>, requires: list<string>}>
      */
     public function packages(): array
     {

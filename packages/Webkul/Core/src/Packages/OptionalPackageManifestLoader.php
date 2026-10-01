@@ -18,6 +18,7 @@ class OptionalPackageManifestLoader
      *     composer_name: string,
      *     provider: class-string<ServiceProvider>,
      *     concord_module: class-string<BaseModuleServiceProvider>|null,
+     *     capabilities: array<string, array{provider: class-string<ServiceProvider>, enabled: bool}>,
      *     requires: list<string>
      * }>
      */
@@ -67,11 +68,54 @@ class OptionalPackageManifestLoader
                 throw new InvalidPackageComposition("Optional package [{$id}] declares an invalid Concord module class.");
             }
 
+            $rawCapabilities = $metadata['capabilities'] ?? [];
+            if (! is_array($rawCapabilities)) {
+                throw new InvalidPackageComposition("Optional package [{$id}] declares an invalid capabilities definition.");
+            }
+
+            $capabilities = [];
+            foreach ($rawCapabilities as $capName => $capConfig) {
+                if (! is_string($capName) || preg_match('/^[a-z][a-z0-9_]*$/', $capName) !== 1) {
+                    $displayCap = is_string($capName) ? $capName : (string) $capName;
+                    throw new InvalidPackageComposition("Optional package [{$id}] declares an invalid capability name [{$displayCap}].");
+                }
+
+                if (! is_array($capConfig)) {
+                    throw new InvalidPackageComposition("Optional package [{$id}] capability [{$capName}] must be an object definition.");
+                }
+
+                $unknownKeys = array_diff(array_keys($capConfig), ['provider', 'enabled']);
+                if ($unknownKeys !== []) {
+                    $firstUnknown = reset($unknownKeys);
+                    throw new InvalidPackageComposition("Optional package [{$id}] capability [{$capName}] contains unknown field [{$firstUnknown}].");
+                }
+
+                if (! array_key_exists('provider', $capConfig)) {
+                    throw new InvalidPackageComposition("Optional package [{$id}] capability [{$capName}] declares an invalid provider class.");
+                }
+
+                $capProvider = $capConfig['provider'];
+                if (! is_string($capProvider) || $capProvider === '' || ! class_exists($capProvider) || ! is_subclass_of($capProvider, ServiceProvider::class)) {
+                    throw new InvalidPackageComposition("Optional package [{$id}] capability [{$capName}] declares an invalid provider class.");
+                }
+
+                $capEnabled = $capConfig['enabled'] ?? true;
+                if (! is_bool($capEnabled)) {
+                    throw new InvalidPackageComposition("Optional package [{$id}] capability [{$capName}] declares an invalid enabled flag.");
+                }
+
+                $capabilities[$capName] = [
+                    'provider' => $capProvider,
+                    'enabled' => $capEnabled,
+                ];
+            }
+
             $packages[$id] = [
                 'id' => $id,
                 'composer_name' => $composerName,
                 'provider' => $provider,
                 'concord_module' => $module,
+                'capabilities' => $capabilities,
                 'requires' => [],
             ];
             $composerNames[$composerName] = $id;

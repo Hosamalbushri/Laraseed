@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8ab390274ec1174444fe5c2c589d0f35",
+    "content-hash": "ad3eab2e98f771b8fa1f8a20a835d444",
     "packages": [
         {
             "name": "brick/math",
@@ -7874,6 +7874,52 @@
             "time": "2025-03-19T14:43:43+00:00"
         },
         {
+            "name": "laraseed/package-generator",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "packages/Laraseed/PackageGenerator",
+                "reference": "6c230c14f2a687ee4d54124250e8fa58e3ddd683"
+            },
+            "require": {
+                "illuminate/console": "^12.0",
+                "illuminate/filesystem": "^12.0",
+                "illuminate/support": "^12.0",
+                "php": "^8.3"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Laraseed\\PackageGenerator\\Providers\\PackageGeneratorServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Laraseed\\PackageGenerator\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Laraseed\\PackageGenerator\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Laraseed Team"
+                }
+            ],
+            "description": "Laraseed Optional Package Generator Development Tool",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
             "name": "laravel/pint",
             "version": "v1.29.0",
             "source": {
@@ -11182,7 +11228,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": {
+        "laraseed/package-generator": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

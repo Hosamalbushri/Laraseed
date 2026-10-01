@@ -28,6 +28,7 @@
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.14",
         "fakerphp/faker": "^1.23",
+        "laraseed/package-generator": "@dev",
         "laravel/pint": "^1.18",
         "laravel/sail": "^1.38",
         "mockery/mockery": "^1.6",
@@ -63,11 +64,13 @@
             "Webkul\\DataGrid\\": "packages/Webkul/DataGrid/src",
             "Webkul\\Installer\\": "packages/Webkul/Installer/src",
             "Webkul\\User\\": "packages/Webkul/User/src",
-            "Webkul\\DebugBar\\": "packages/Webkul/DebugBar/src"
+            "Webkul\\DebugBar\\": "packages/Webkul/DebugBar/src",
+            "Laraseed\\Contacts\\": "packages/Laraseed/Contacts/src"
         }
     },
     "autoload-dev": {
         "psr-4": {
+            "Laraseed\\PackageGenerator\\": "packages/Laraseed/PackageGenerator/src",
             "Tests\\": "tests/"
         }
     },

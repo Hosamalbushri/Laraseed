@@ -2,11 +2,22 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('admin/login', fn () => 'Admin Login')->name('admin.session.create');
-Route::get('admin', fn () => redirect()->route('admin.session.create'))->name('admin');
-Route::get('install', fn () => 'Installer')->name('installer.index');
-Route::get('api/health', fn () => response()->json(['status' => 'ok']));
-Route::get('up', fn () => response('OK', 200));
+$adminPath = trim((string) config('app.admin_path', 'admin'), '/');
+
+if ($adminPath !== 'admin' && $adminPath !== '') {
+    Route::redirect('/admin', '/'.$adminPath, 302);
+    Route::redirect('/admin/', '/'.$adminPath, 302);
+
+    Route::get('/admin/{path?}', function (?string $path = null) use ($adminPath) {
+        $target = '/'.$adminPath;
+
+        if ($path !== null && $path !== '') {
+            $target .= '/'.ltrim($path, '/');
+        }
+
+        return redirect($target, 302);
+    })->where('path', '.*');
+}
 
 if (! config('laraseed.web.root_owner')) {
     Route::get('/', [\App\Http\Controllers\WebEntryPointController::class, 'index'])->name('laraseed.web.entry');

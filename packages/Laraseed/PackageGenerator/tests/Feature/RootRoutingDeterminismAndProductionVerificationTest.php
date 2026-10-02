@@ -164,6 +164,7 @@ if (file_exists('{$helpersPath}')) {
 \$app = require 'bootstrap/app.php';
 \Illuminate\Support\Facades\Facade::setFacadeApplication(\$app);
 \$app->make('Illuminate\\\\Contracts\\\\Http\\\\Kernel')->bootstrap();
+\$app->instance('request', \Illuminate\Http\Request::create(config('app.url') ?: 'http://127.0.0.1:8000'));
 \$app->boot();
 if (\$app->routesAreCached()) {
     require \$app->getCachedRoutesPath();

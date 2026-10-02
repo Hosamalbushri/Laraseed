@@ -55,6 +55,11 @@ abstract class TestCase extends BaseTestCase
 
     public function getSubprocessAutoloadPath(): string
     {
+        $isHostApp = ! str_contains(base_path(), 'testbench-core') && file_exists(base_path('vendor/autoload.php'));
+        if ($isHostApp) {
+            return realpath(base_path('vendor/autoload.php'));
+        }
+
         $packageRoot = getenv('TESTBENCH_WORKING_PATH') ?: realpath(__DIR__ . '/../');
         $candidates = array_filter([
             $packageRoot ? realpath($packageRoot . '/vendor/autoload.php') : null,
@@ -98,6 +103,11 @@ abstract class TestCase extends BaseTestCase
      */
     protected function ensureTestbenchHostFiles(): void
     {
+        $isTestbench = str_contains(base_path(), 'testbench-core') || ! file_exists(base_path('packages/Webkul'));
+        if (! $isTestbench) {
+            return;
+        }
+
         // 1. Ensure bootstrap/autoload.php exists and correctly loads root autoloader and helpers
         $autoloadPhp = base_path('bootstrap/autoload.php');
         @mkdir(dirname($autoloadPhp), 0755, true);

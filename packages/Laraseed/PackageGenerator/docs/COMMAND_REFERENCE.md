@@ -29,6 +29,7 @@ Complete reference guide for all Artisan CLI commands provided by `laraseed/pack
 | [`laraseed:make-provider`](#laraseedmake-provider) | Generate a secondary ServiceProvider | `--dry-run`, `--force` |
 | [`laraseed:make-module-provider`](#laraseedmake-module-provider) | Generate or regenerate Concord Module Provider | `--dry-run`, `--force` |
 | [`laraseed:make-route`](#laraseedmake-route) | Generate package-owned route file | `--type=`, `--dry-run`, `--force` |
+| [`laraseed:web-default`](#laraseedweb-default) | Manage, inspect, select, or clear the default public Web package | `--list`, `--status`, `--clear`, `--dry-run` |
 | [`laraseed:packages`](#laraseedpackages) | Display installed and enabled optional packages | *(Read-only)* |
 | [`laraseed:version`](#laraseedversion) | Display currently installed Laraseed version | *(Read-only)* |
 
@@ -217,6 +218,37 @@ php artisan laraseed:make-web <package> [--template=] [--dry-run] [--force]
 ```
 - **Options:**
   - `--template=`: Select template from registry (`starter` is default; custom templates registered in `config/laraseed.php` are supported).
+
+---
+
+### `laraseed:web-default`
+Manages, inspects, selects, or clears the default public Web package providing the root `/` entry point.
+
+```bash
+php artisan laraseed:web-default [package] [--list] [--status] [--clear] [--dry-run] [--force]
+```
+- **Arguments:**
+  - `package`: (Optional) The package identifier to select as default (must be enabled in `LARASEED_OPTIONAL_PACKAGES` and declare Web capability).
+- **Options:**
+  - `--list`: Displays a formatted table of all discovered Web packages, their activation status, registered entry route, and whether they are currently default.
+  - `--status`: Inspects the currently configured default package, route resolution, target URL, and operational health.
+  - `--clear`: Clears the default Web package selection so `/` safely serves the built-in fallback view.
+  - `--dry-run`: Simulates validation and environment persistence without modifying disk.
+  - `--force`: Bypasses non-fatal diagnostic warnings during selection.
+- **Examples:**
+  ```bash
+  # List all discovered Web-capable packages
+  php artisan laraseed:web-default --list
+
+  # Check status of the current default selection
+  php artisan laraseed:web-default --status
+
+  # Set "store" package as default
+  php artisan laraseed:web-default store
+
+  # Clear default selection
+  php artisan laraseed:web-default --clear
+  ```
 
 ---
 

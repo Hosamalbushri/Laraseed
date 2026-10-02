@@ -115,7 +115,7 @@ class UniversalPackageLifecycleTest extends TestCase
         $this->assertStringContainsString('DISABLED', $foundationResult['output']);
 
         $foundationRoutes = $this->routesForComposition([]);
-        $this->assertCount(67, $foundationRoutes);
+        $this->assertCount(68, $foundationRoutes);
 
         // 2. Contacts-enabled CLI execution
         $contactsResult = $this->runCompositionCommand(['contacts'], ['laraseed:packages']);
@@ -123,7 +123,7 @@ class UniversalPackageLifecycleTest extends TestCase
         $this->assertStringContainsString('ACTIVE', $contactsResult['output']);
 
         $contactsRoutes = $this->routesForComposition(['contacts']);
-        $this->assertCount(82, $contactsRoutes);
+        $this->assertCount(83, $contactsRoutes);
     }
 
     public function test_config_caching_invariance(): void

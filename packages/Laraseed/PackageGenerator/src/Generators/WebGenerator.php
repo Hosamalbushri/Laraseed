@@ -82,22 +82,23 @@ class WebGenerator
                 ]);
             }
 
+            $packageKey = strtolower($identity->vendor) . '_' . $identity->packageSnake;
+            $packageSlug = $identity->vendorKebab . '-' . $identity->packageKebab;
+            $packageTitle = Str::headline($identity->package);
+            $upperPackageKey = strtoupper($packageKey);
+
             $webProviderClass = $resolved->namespace . '\\Web\\Providers\\WebServiceProvider';
             if (! isset($composerData['extra']['laraseed']['capabilities']) || ! is_array($composerData['extra']['laraseed']['capabilities'])) {
                 $composerData['extra']['laraseed']['capabilities'] = [];
             }
             $composerData['extra']['laraseed']['capabilities']['web'] = [
                 'provider' => $webProviderClass,
-                'enabled' => true,
+                'enabled'  => true,
             ];
 
             $newComposerJson = json_encode($composerData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "\n";
 
             // 2. Prepare Web capability files from template
-            $packageKey = strtolower($identity->vendor) . '_' . $identity->packageSnake;
-            $packageSlug = $identity->vendorKebab . '-' . $identity->packageKebab;
-            $packageTitle = Str::headline($identity->package);
-            $upperPackageKey = strtoupper($packageKey);
 
             $replacements = [
                 '{{ PACKAGE_KEY }}'       => $packageKey,

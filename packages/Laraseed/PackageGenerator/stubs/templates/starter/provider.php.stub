@@ -92,7 +92,16 @@ class WebServiceProvider extends ServiceProvider
             }
 
             if ($this->app->bound(AuthenticationRedirectResolver::class)) {
-                $prefix = (string) config('{{ PACKAGE_KEY }}_web.prefix', '{{ PACKAGE_SLUG }}');
+                $rawPrefix = config('{{ PACKAGE_KEY }}_web.prefix');
+                $defaultPkg = (string) (config('laraseed.default_web_package') ?? config('laraseed.web.default_package') ?? '');
+                $isDefault = $defaultPkg !== '' && (
+                    strtolower(str_replace('-', '_', $defaultPkg)) === '{{ PACKAGE_KEY }}'
+                    || strtolower(str_replace('-', '_', $defaultPkg)) === '{{ PACKAGE_ID }}'
+                );
+                $prefix = $isDefault && ($rawPrefix === null || $rawPrefix === '' || $rawPrefix === '{{ PACKAGE_SLUG }}')
+                    ? ''
+                    : (string) ($rawPrefix ?? '{{ PACKAGE_SLUG }}');
+
                 $this->app->make(AuthenticationRedirectResolver::class)->register(
                     '{{ PACKAGE_KEY }}_web',
                     function (Request $request) use ($prefix): bool {
@@ -126,19 +135,42 @@ class WebServiceProvider extends ServiceProvider
                     50
                 );
             }
+
         }
 
         if (file_exists(__DIR__ . '/../Routes/web.php')) {
-            $prefix = (string) config('{{ PACKAGE_KEY }}_web.prefix', '{{ PACKAGE_SLUG }}');
-            $middleware = config('{{ PACKAGE_KEY }}_web.middleware', ['web']);
+            $defaultPkg = (string) (config('laraseed.default_web_package') ?? config('laraseed.web.default_package') ?? '');
+            $isDefault = $defaultPkg !== '' && (
+                strtolower(str_replace('-', '_', $defaultPkg)) === '{{ PACKAGE_KEY }}'
+                || strtolower(str_replace('-', '_', $defaultPkg)) === '{{ PACKAGE_ID }}'
+            );
 
+            $rawPrefix = config('{{ PACKAGE_KEY }}_web.prefix');
+
+            if ($isDefault && ($rawPrefix === null || $rawPrefix === '' || $rawPrefix === '{{ PACKAGE_SLUG }}')) {
+                $prefix = '';
+            } else {
+                $prefix = (string) ($rawPrefix ?? '{{ PACKAGE_SLUG }}');
+            }
+
+            $middleware = config('{{ PACKAGE_KEY }}_web.middleware', ['web']);
             $normalizedPrefix = trim($prefix, '/');
+
+            // Guard against collision with core protected system route prefixes
+            $reservedPrefixes = ['admin', 'install', 'api', 'up', 'sanctum', (string) config('app.admin_path', 'admin')];
+            if ($normalizedPrefix !== '' && in_array($normalizedPrefix, array_filter($reservedPrefixes), true)) {
+                throw new \RuntimeException(sprintf(
+                    'Route conflict: Package [%s] specifies route prefix [%s], which conflicts with protected system route prefix.',
+                    '{{ PACKAGE_KEY }}',
+                    $normalizedPrefix
+                ));
+            }
 
             if ($normalizedPrefix === '') {
                 $rootOwner = config('laraseed.web.root_owner');
                 if ($rootOwner && $rootOwner !== '{{ PACKAGE_KEY }}') {
                     throw new \RuntimeException(sprintf(
-                        'Route conflict: Package [%s] attempted to claim the root route [/], but it is already owned by [%s].',
+                        'Route conflict: Package [%s] attempted to claim the root route [/], but it is already owned by [%s]. Only one package may be root-mounted.',
                         '{{ PACKAGE_KEY }}',
                         $rootOwner
                     ));
@@ -152,3 +184,4 @@ class WebServiceProvider extends ServiceProvider
         }
     }
 }
+

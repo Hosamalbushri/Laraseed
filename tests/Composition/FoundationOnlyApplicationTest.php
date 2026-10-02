@@ -46,7 +46,7 @@ class FoundationOnlyApplicationTest extends TestCase
             || str_starts_with($route->getActionName(), 'Webkul\\Web\\'));
 
         $this->assertSame([], $composition->enabledPackages());
-        $this->assertCount(67, $routes);
+        $this->assertCount(68, $routes);
         $this->assertCount(0, $optionalRoutes);
         $this->assertSame([], config('laraseed.optional_packages.concord_modules'));
         $this->assertArrayNotHasKey('student', config('auth.guards'));
@@ -154,11 +154,12 @@ class FoundationOnlyApplicationTest extends TestCase
             || str_starts_with(ltrim($route->getActionName(), '\\'), 'Laravel\\')
             || $route->getActionName() === 'Closure');
 
-        $this->assertCount(67, $routes);
+        $this->assertCount(68, $routes);
         $this->assertCount(3, $frameworkRoutes);
-        $this->assertSame(64, $routes->count() - $frameworkRoutes->count());
+        $this->assertSame(65, $routes->count() - $frameworkRoutes->count());
 
         $root = $routes->first(fn (RoutingRoute $route): bool => $route->uri() === '/' && in_array('GET', $route->methods(), true));
-        $this->assertNull($root, 'Public root / route is intentionally absent in Foundation-only state');
+        $this->assertNotNull($root, 'Public root / route is provided by Core Web Entry Point');
+        $this->assertSame('laraseed.web.entry', $root->getName());
     }
 }

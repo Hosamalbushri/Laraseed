@@ -21,6 +21,8 @@
 
         <testsuite name="Packages">
             <directory suffix="Test.php">./packages</directory>
+            <exclude>./packages/*/vendor</exclude>
+            <exclude>./packages/*/*/vendor</exclude>
         </testsuite>
     </testsuites>
 

@@ -123,11 +123,14 @@ it('enforces that central configuration and providers contain zero residue of de
         ->not->toContain('Webkul\\Website\\Providers\\WebsiteServiceProvider');
 });
 
-it('enforces that Foundation route composition contains zero routes from deleted packages and no fallback root route', function () {
+it('enforces that Foundation route composition contains zero routes from deleted packages', function () {
     $routes = $this->routesForComposition([]);
     $root = collect($routes)->firstWhere('uri', '/');
 
-    expect($root)->toBeNull();
+    if ($root !== null) {
+        expect($root['name'] ?? '')->toBe('laraseed.web.entry');
+        expect($root['action'] ?? '')->toBe('App\\Http\\Controllers\\WebEntryPointController@index');
+    }
 
     foreach ($routes as $route) {
         $action = $route['action'] ?? '';

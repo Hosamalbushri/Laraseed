@@ -54,3 +54,5 @@ return [
 | :--- | :--- | :--- |
 | `LARASEED_OPTIONAL_PACKAGES` | `""` | Comma-separated list of enabled optional package identifiers. |
 | `LARASEED_PACKAGES_PATH` | `"packages"` | Base directory for generated packages. |
+| `LARASEED_DEFAULT_WEB_PACKAGE` | `null` | Key of the enabled optional package to serve as the default web entry point (`/`). |
+

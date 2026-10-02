@@ -23,12 +23,14 @@ use Laraseed\PackageGenerator\Console\Commands\RepositoryMakeCommand;
 use Laraseed\PackageGenerator\Console\Commands\RequestMakeCommand;
 use Laraseed\PackageGenerator\Console\Commands\RouteMakeCommand;
 use Laraseed\PackageGenerator\Console\Commands\SeederMakeCommand;
+use Laraseed\PackageGenerator\Console\Commands\WebDefaultCommand;
 use Laraseed\PackageGenerator\Console\Commands\WebMakeCommand;
 use Laraseed\PackageGenerator\Generators\AdminGenerator;
 use Laraseed\PackageGenerator\Generators\FilesystemWriter;
 use Laraseed\PackageGenerator\Generators\PackageGenerator;
 use Laraseed\PackageGenerator\Generators\StubRenderer;
 use Laraseed\PackageGenerator\Generators\WebGenerator;
+use Laraseed\PackageGenerator\Support\DefaultWebPackageManager;
 use Laraseed\PackageGenerator\Support\PackageLock;
 use Laraseed\PackageGenerator\Support\PackageResolver;
 
@@ -41,6 +43,10 @@ class PackageGeneratorServiceProvider extends ServiceProvider
     {
         $this->app->singleton(PackageLock::class, function ($app) {
             return new PackageLock(basePath: $app->basePath());
+        });
+
+        $this->app->singleton(DefaultWebPackageManager::class, function ($app) {
+            return new DefaultWebPackageManager(basePath: $app->basePath());
         });
 
         $this->app->singleton(FilesystemWriter::class, function ($app) {
@@ -108,6 +114,7 @@ class PackageGeneratorServiceProvider extends ServiceProvider
                 DataGridMakeCommand::class,
                 AdminMakeCommand::class,
                 WebMakeCommand::class,
+                WebDefaultCommand::class,
             ]);
         }
     }

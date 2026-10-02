@@ -71,6 +71,7 @@
     "autoload-dev": {
         "psr-4": {
             "Laraseed\\PackageGenerator\\": "packages/Laraseed/PackageGenerator/src",
+            "Laraseed\\PackageGenerator\\Tests\\": "packages/Laraseed/PackageGenerator/tests/",
             "Tests\\": "tests/"
         }
     },

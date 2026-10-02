@@ -16,15 +16,17 @@ class ModelMakeCommand extends Command
     protected $signature = 'laraseed:make-model
                             {package : The vendor and package name in Vendor/PackageName format (e.g. Acme/Blog)}
                             {name : The Model class name (e.g. Post)}
+                            {--contract : Generate companion Contract interface}
+                            {--proxy : Generate companion Contract interface and Concord ModelProxy}
                             {--dry-run : Simulate generation without creating or modifying any files}
-                            {--force : Force overwrite of existing model file}';
+                            {--force : Force overwrite of existing model, contract, or proxy files}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Generate a new Eloquent model within the specified Laraseed package';
+    protected $description = 'Generate a new Eloquent model (with optional Contract and Concord Proxy) within the specified Laraseed package';
 
     /**
      * Execute the console command.
@@ -33,11 +35,21 @@ class ModelMakeCommand extends Command
     {
         $packageInput = (string) $this->argument('package');
         $modelName = (string) $this->argument('name');
+        $withContract = (bool) $this->option('contract');
+        $withProxy = (bool) $this->option('proxy');
         $dryRun = (bool) $this->option('dry-run');
         $force = (bool) $this->option('force');
 
         try {
-            $result = $generator->generate($packageInput, $modelName, $dryRun, $force);
+            $result = $generator->generate(
+                packageInput: $packageInput,
+                modelName: $modelName,
+                withProxy: $withProxy,
+                withContract: $withContract,
+                dryRun: $dryRun,
+                force: $force
+            );
+
             $pkg = $result['package'];
 
             if ($dryRun) {
@@ -52,7 +64,16 @@ class ModelMakeCommand extends Command
             $this->table(['File Path', 'Action', 'Size'], $tableData);
 
             if (! $dryRun) {
-                $this->components->info("Model [{$pkg->namespace}\\Models\\{$modelName}] generated successfully!");
+                if ($result['has_proxy']) {
+                    $this->components->info("Model [{$pkg->namespace}\\Models\\{$modelName}], Contract [{$pkg->namespace}\\Contracts\\{$modelName}], and Proxy [{$pkg->namespace}\\Models\\{$modelName}Proxy] generated successfully!");
+                    $this->components->bulletList([
+                        "Register model in [src/Providers/ModuleServiceProvider.php]: protected \$models = [ {$modelName}::class ];",
+                    ]);
+                } elseif ($result['has_contract']) {
+                    $this->components->info("Model [{$pkg->namespace}\\Models\\{$modelName}] and Contract [{$pkg->namespace}\\Contracts\\{$modelName}] generated successfully!");
+                } else {
+                    $this->components->info("Model [{$pkg->namespace}\\Models\\{$modelName}] generated successfully!");
+                }
             }
 
             return self::SUCCESS;

@@ -12,7 +12,8 @@ class WebMakeCommand extends Command
     protected $signature = 'laraseed:make-web
                             {package : The vendor and package name in Vendor/PackageName format (e.g. Acme/Blog)}
                             {--template=starter : The Web template to scaffold (default: starter)}
-                            {--dry-run : Simulate generation without creating or modifying any files}';
+                            {--dry-run : Simulate generation without creating or modifying any files}
+                            {--force : Force overwrite of existing web capability files}';
 
     protected $description = 'Generate optional Web capability skeleton within the specified Laraseed package';
 
@@ -21,9 +22,10 @@ class WebMakeCommand extends Command
         $packageInput = (string) $this->argument('package');
         $template = (string) ($this->option('template') ?: WebTemplateCatalog::defaultTemplateId());
         $dryRun = (bool) $this->option('dry-run');
+        $force = (bool) $this->option('force');
 
         try {
-            $result = $generator->generate($packageInput, $template, $dryRun);
+            $result = $generator->generate($packageInput, $template, $dryRun, $force);
             $pkg = $result['package'];
 
             if ($dryRun) {

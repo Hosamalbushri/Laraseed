@@ -12,11 +12,11 @@ class WebTemplateCatalog
     public const DEFAULT_TEMPLATE = 'starter';
 
     /**
-     * Registered Web templates metadata.
+     * Built-in default template definitions.
      *
      * @var array<string, array{id: string, name: string, description: string, files: array<string, string>}>
      */
-    protected static array $templates = [
+    protected static array $defaultTemplates = [
         'starter' => [
             'id' => 'starter',
             'name' => 'Web Starter',
@@ -56,12 +56,116 @@ class WebTemplateCatalog
     ];
 
     /**
+     * Registered Web templates metadata.
+     *
+     * @var array<string, array{id: string, name: string, description: string, files: array<string, string>}>
+     */
+    protected static array $templates = [];
+
+    /**
+     * Ensure the template catalog is initialized.
+     */
+    protected static function ensureInitialized(): void
+    {
+        if (empty(static::$templates)) {
+            static::$templates = static::$defaultTemplates;
+            static::registerFromConfig();
+        }
+    }
+
+    /**
+     * Register a new Web template definition into the catalog.
+     *
+     * @param  string  $id
+     * @param  array{name: string, description?: string, files: array<string, string>}  $definition
+     * @param  bool  $overwrite
+     * @return void
+     *
+     * @throws PackageGenerationException
+     */
+    public static function register(string $id, array $definition, bool $overwrite = false): void
+    {
+        if (! preg_match('/^[a-z0-9_-]+$/', $id)) {
+            throw PackageGenerationException::invalidInput(
+                "Invalid template ID [{$id}]. Template IDs may only contain lowercase alphanumeric characters, underscores, and dashes."
+            );
+        }
+
+        static::ensureInitialized();
+
+        if (isset(static::$templates[$id]) && ! $overwrite) {
+            throw PackageGenerationException::invalidInput("Web template [{$id}] is already registered.");
+        }
+
+        if (empty($definition['name']) || ! is_string($definition['name'])) {
+            throw PackageGenerationException::invalidInput("Template [{$id}] definition must include a non-empty string 'name'.");
+        }
+
+        if (isset($definition['description']) && ! is_string($definition['description'])) {
+            throw PackageGenerationException::invalidInput("Template [{$id}] definition 'description' must be a string.");
+        }
+
+        if (empty($definition['files']) || ! is_array($definition['files'])) {
+            throw PackageGenerationException::invalidInput("Template [{$id}] definition must include a non-empty array of 'files'.");
+        }
+
+        foreach ($definition['files'] as $dest => $stub) {
+            if (! is_string($dest) || trim($dest) === '' || ! is_string($stub) || trim($stub) === '') {
+                throw PackageGenerationException::invalidInput("Template [{$id}] files mapping must contain non-empty string keys and values.");
+            }
+        }
+
+        static::$templates[$id] = [
+            'id'          => $id,
+            'name'        => $definition['name'],
+            'description' => $definition['description'] ?? '',
+            'files'       => $definition['files'],
+        ];
+    }
+
+    /**
+     * Unregister a template by ID.
+     */
+    public static function unregister(string $id): void
+    {
+        static::ensureInitialized();
+        unset(static::$templates[$id]);
+    }
+
+    /**
+     * Reset the catalog to default built-in templates.
+     */
+    public static function reset(): void
+    {
+        static::$templates = static::$defaultTemplates;
+    }
+
+    /**
+     * Register templates defined in the host application configuration.
+     */
+    public static function registerFromConfig(): void
+    {
+        if (function_exists('config')) {
+            $configTemplates = config('laraseed.web_templates', []);
+            if (is_array($configTemplates)) {
+                foreach ($configTemplates as $id => $def) {
+                    if (is_string($id) && is_array($def)) {
+                        static::register($id, $def, overwrite: true);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * Get all registered templates.
      *
      * @return array<string, array{id: string, name: string, description: string, files: array<string, string>}>
      */
     public static function all(): array
     {
+        static::ensureInitialized();
+
         return static::$templates;
     }
 
@@ -72,6 +176,8 @@ class WebTemplateCatalog
      */
     public static function getAvailableTemplateIds(): array
     {
+        static::ensureInitialized();
+
         return array_keys(static::$templates);
     }
 
@@ -80,6 +186,8 @@ class WebTemplateCatalog
      */
     public static function has(string $templateId): bool
     {
+        static::ensureInitialized();
+
         return isset(static::$templates[$templateId]);
     }
 
@@ -92,6 +200,8 @@ class WebTemplateCatalog
      */
     public static function get(string $templateId): array
     {
+        static::ensureInitialized();
+
         if (! static::has($templateId)) {
             $available = implode(', ', static::getAvailableTemplateIds());
             throw PackageGenerationException::invalidInput(

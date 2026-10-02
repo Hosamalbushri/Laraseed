@@ -19,7 +19,7 @@ class StubRenderer
      */
     public function render(string $stubName, PackageIdentity $identity): string
     {
-        $file = "{$this->stubsPath}/{$stubName}";
+        $file = str_starts_with($stubName, DIRECTORY_SEPARATOR) ? $stubName : "{$this->stubsPath}/{$stubName}";
 
         if (! file_exists($file)) {
             throw PackageGenerationException::invalidInput("Stub file [{$stubName}] not found at [{$file}].");

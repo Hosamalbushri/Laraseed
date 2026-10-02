@@ -3,6 +3,7 @@
 namespace Laraseed\PackageGenerator\Generators;
 
 use Laraseed\PackageGenerator\Exceptions\PackageGenerationException;
+use Laraseed\PackageGenerator\Support\PathGuard;
 
 class GenerationPlan
 {
@@ -24,17 +25,20 @@ class GenerationPlan
     }
 
     /**
-     * Perform preflight collision check for all planned files.
+     * Perform preflight collision and path containment checks for all planned files.
      *
      * @throws PackageGenerationException
      */
     public function preflight(bool $force): void
     {
-        $collisions = [];
         $targetDir = $this->targetDirectory();
+        PathGuard::assertWithinAuthorizedPackages($targetDir, $this->basePath, 'Target package');
+
+        $collisions = [];
 
         foreach ($this->files as $relativePath => $content) {
             $fullPath = "{$targetDir}/{$relativePath}";
+            PathGuard::assertWithinAuthorizedPackages($fullPath, $this->basePath, 'File destination');
 
             if (file_exists($fullPath)) {
                 if (! $force) {

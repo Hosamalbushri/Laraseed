@@ -149,9 +149,6 @@ class WebServiceProvider extends ServiceProvider
             Route::middleware($middleware)
                 ->prefix($prefix)
                 ->group(__DIR__ . '/../Routes/web.php');
-
-            $this->app['router']->getRoutes()->refreshNameLookups();
-            $this->app['router']->getRoutes()->refreshActionLookups();
         }
     }
 }

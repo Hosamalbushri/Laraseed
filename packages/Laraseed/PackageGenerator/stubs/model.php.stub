@@ -3,8 +3,7 @@
 namespace {{ NAMESPACE }}\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
-class {{ CLASS_NAME }} extends Model
+{{ CONTRACT_IMPORT }}class {{ CLASS_NAME }} extends Model{{ IMPLEMENTS_CONTRACT }}
 {
     /**
      * The attributes that are mass assignable.

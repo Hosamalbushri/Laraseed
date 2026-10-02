@@ -18,46 +18,120 @@ class ModelGenerator
     ) {
         $this->basePath = $basePath ?? base_path();
         $this->resolver = new PackageResolver(basePath: $this->basePath);
+        $this->writer = new FilesystemWriter(basePath: $this->basePath);
     }
 
     /**
-     * Generate an Eloquent model for the specified package.
+     * Generate an Eloquent model (and optional companion Contract and Concord Proxy) for the specified package.
      *
      * @return array{
      *     package: ResolvedPackage,
      *     model: string,
+     *     has_contract: bool,
+     *     has_proxy: bool,
      *     dry_run: bool,
      *     force: bool,
      *     files: array<int, array{path: string, full_path: string, action: string, bytes: int}>
      * }
      */
-    public function generate(string $packageInput, string $modelName, bool $dryRun = false, bool $force = false): array
-    {
+    public function generate(
+        string $packageInput,
+        string $modelName,
+        bool $withProxy = false,
+        bool $withContract = false,
+        bool $dryRun = false,
+        bool $force = false
+    ): array {
         $resolved = $this->resolver->resolve($packageInput);
         $this->validateModelName($modelName);
 
-        $stub = "<?php\n\nnamespace {{ NAMESPACE }}\\Models;\n\nuse Illuminate\\Database\\Eloquent\\Model;\n\nclass {{ CLASS_NAME }} extends Model\n{\n    /**\n     * The attributes that are mass assignable.\n     *\n     * @var array<int, string>\n     */\n    protected \$fillable = [\n    ];\n}\n";
+        // Proxy mode implies contract generation automatically
+        $hasContract = $withContract || $withProxy;
+        $hasProxy = $withProxy;
 
-        $content = str_replace(
-            ['{{ NAMESPACE }}', '{{ CLASS_NAME }}'],
-            [$resolved->namespace, $modelName],
-            $stub
+        $files = [];
+
+        // 1. Model file
+        $modelStub = $this->renderer->render('model.php.stub', $resolved->identity);
+        $contractImport = $hasContract
+            ? "use {$resolved->namespace}\\Contracts\\{$modelName} as {$modelName}Contract;\n\n"
+            : '';
+        $implementsClause = $hasContract
+            ? " implements {$modelName}Contract"
+            : '';
+
+        $modelContent = str_replace(
+            [
+                '{{ NAMESPACE }}',
+                '{{ CLASS_NAME }}',
+                '{{ CONTRACT_IMPORT }}',
+                '{{ IMPLEMENTS_CONTRACT }}',
+                $resolved->identity->namespace,
+            ],
+            [
+                $resolved->namespace,
+                $modelName,
+                $contractImport,
+                $implementsClause,
+                $resolved->namespace,
+            ],
+            $modelStub
         );
+        $files["src/Models/{$modelName}.php"] = $modelContent;
 
-        $relativePath = "src/Models/{$modelName}.php";
-        $files = [$relativePath => $content];
+        // 2. Contract file
+        if ($hasContract) {
+            $contractStub = $this->renderer->render('contract.php.stub', $resolved->identity);
+            $contractContent = str_replace(
+                [
+                    '{{ NAMESPACE }}',
+                    '{{ CONTRACT_NAME }}',
+                    $resolved->identity->namespace,
+                ],
+                [
+                    $resolved->namespace,
+                    $modelName,
+                    $resolved->namespace,
+                ],
+                $contractStub
+            );
+            $files["src/Contracts/{$modelName}.php"] = $contractContent;
+        }
 
+        // 3. Proxy file
+        if ($hasProxy) {
+            $proxyStub = $this->renderer->render('proxy.php.stub', $resolved->identity);
+            $proxyClassName = "{$modelName}Proxy";
+            $proxyContent = str_replace(
+                [
+                    '{{ NAMESPACE }}',
+                    '{{ CLASS_NAME }}',
+                    $resolved->identity->namespace,
+                ],
+                [
+                    $resolved->namespace,
+                    $proxyClassName,
+                    $resolved->namespace,
+                ],
+                $proxyStub
+            );
+            $files["src/Models/{$proxyClassName}.php"] = $proxyContent;
+        }
+
+        // Bundle all artifacts into a single atomic generation plan
         $plan = new GenerationPlan($resolved->identity->relativePackagePath, $this->basePath, $files);
         $plan->preflight($force);
 
         $results = $this->writer->execute($plan, $dryRun, $force);
 
         return [
-            'package' => $resolved,
-            'model' => $modelName,
-            'dry_run' => $dryRun,
-            'force' => $force,
-            'files' => $results,
+            'package'      => $resolved,
+            'model'        => $modelName,
+            'has_contract' => $hasContract,
+            'has_proxy'    => $hasProxy,
+            'dry_run'      => $dryRun,
+            'force'        => $force,
+            'files'        => $results,
         ];
     }
 

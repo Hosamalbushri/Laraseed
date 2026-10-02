@@ -25,4 +25,9 @@ class PackageGenerationException extends RuntimeException
     {
         return new self("Cannot create package: [{$name}] is a reserved Foundation package or namespace name.");
     }
+
+    public static function lockTimeout(string $package, int $seconds): self
+    {
+        return new self("Package generation aborted: Timeout acquiring exclusive lock for package [{$package}] after {$seconds} seconds. Another generation process may be in progress.");
+    }
 }

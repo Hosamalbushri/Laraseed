@@ -37,11 +37,14 @@ class PackageResolver
         $relativePackagePath = $identity->relativePackagePath;
         $packagePath = rtrim($this->basePath, '/') . '/' . $relativePackagePath;
 
+        PathGuard::assertWithinAuthorizedPackages($packagePath, $this->basePath, 'Package');
+
         if (! $this->filesystem->isDirectory($packagePath)) {
             throw PackageGenerationException::invalidInput("Package [{$input}] not found at [{$relativePackagePath}]. Generate package first using laraseed:make-package.");
         }
 
         $manifestPath = "{$packagePath}/composer.json";
+        PathGuard::assertWithinAuthorizedPackages($manifestPath, $this->basePath, 'Package manifest');
 
         if (! $this->filesystem->exists($manifestPath)) {
             throw PackageGenerationException::invalidInput("Package manifest composer.json missing at [{$relativePackagePath}/composer.json].");

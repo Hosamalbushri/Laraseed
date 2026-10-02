@@ -3,7 +3,6 @@ export default {
     content: [
         "./src/Web/Resources/**/*.blade.php",
         "./src/Web/Resources/**/*.js",
-        "./src/Web/Resources/**/*.vue",
     ],
 
     theme: {

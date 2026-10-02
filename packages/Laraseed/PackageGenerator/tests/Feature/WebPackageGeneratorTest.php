@@ -1,12 +1,12 @@
 <?php
 
-namespace Tests\Feature\Laraseed;
+namespace Laraseed\PackageGenerator\Tests\Feature;
 
 use Illuminate\Filesystem\Filesystem;
 use Laraseed\PackageGenerator\Support\PackageIdentity;
 use Webkul\Core\Packages\OptionalPackageComposition;
 use Webkul\Core\Packages\OptionalPackageManifestLoader;
-use Tests\TestCase;
+use Laraseed\PackageGenerator\Tests\TestCase;
 
 class WebPackageGeneratorTest extends TestCase
 {
@@ -126,6 +126,32 @@ class WebPackageGeneratorTest extends TestCase
 
         // Second run without force must fail due to collision
         $this->artisan('laraseed:make-web AcmeTest/WebCollisionPkg')->assertExitCode(1);
+
+        // Second run with force must succeed cleanly
+        $this->artisan('laraseed:make-web AcmeTest/WebCollisionPkg --force')->assertExitCode(0);
+    }
+
+    public function test_make_web_generates_optimized_vanilla_frontend_without_vue_dependency(): void
+    {
+        $pkgDir = $this->trackDirectory('packages/AcmeTest/WebOptPkg');
+        $this->artisan('laraseed:make-package AcmeTest/WebOptPkg')->assertExitCode(0);
+        $this->artisan('laraseed:make-web AcmeTest/WebOptPkg')->assertExitCode(0);
+
+        $packageJson = json_decode((string) file_get_contents("{$pkgDir}/package.json"), true);
+        $this->assertArrayNotHasKey('vue', $packageJson['devDependencies'] ?? []);
+        $this->assertArrayNotHasKey('vue', $packageJson['dependencies'] ?? []);
+        $this->assertArrayNotHasKey('@vitejs/plugin-vue', $packageJson['devDependencies'] ?? []);
+        $this->assertArrayNotHasKey('@vitejs/plugin-vue', $packageJson['dependencies'] ?? []);
+
+        $assetJs = (string) file_get_contents("{$pkgDir}/src/Web/Resources/assets/js/app.js");
+        $this->assertStringNotContainsString('vue/dist/vue.esm-bundler', $assetJs);
+        $this->assertStringNotContainsString('createApp', $assetJs);
+        $this->assertStringContainsString('class WebStarterKernel', $assetJs);
+        $this->assertStringContainsString('window.LaraseedWeb = kernel;', $assetJs);
+
+        $providerCode = (string) file_get_contents("{$pkgDir}/src/Web/Providers/WebServiceProvider.php");
+        $this->assertStringNotContainsString('refreshNameLookups', $providerCode);
+        $this->assertStringNotContainsString('refreshActionLookups', $providerCode);
     }
 
     public function test_make_web_dry_run_creates_zero_files_and_leaves_composer_json_unmodified(): void
@@ -465,15 +491,18 @@ class WebPackageGeneratorTest extends TestCase
         $response = $this->get(route('acmetest_web_responsive_pkg.web.home'));
         $response->assertStatus(200);
 
-        // Assert mobile menu elements
+        // Assert mobile menu elements and accessibility
         $response->assertSee('id="mobile-menu"', false);
-        $response->assertSee('onclick="document.getElementById(\'mobile-menu\').classList.toggle(\'hidden\')"', false);
+        $response->assertSee('data-action="toggle-mobile-menu"', false);
+        $response->assertSee('aria-controls="mobile-menu"', false);
+        $response->assertDontSee('onclick=', false);
 
         // Assert dark mode toggle
         $response->assertSee('aria-label="Toggle Dark Mode"', false);
+        $response->assertSee('data-action="toggle-dark-mode"', false);
 
         // Assert Cairo typography
-        $response->assertSee('Cairo');
+        $response->assertSee('font-cairo');
     }
 
     public function test_locale_switching_and_rtl_ltr_directionality(): void
@@ -1285,9 +1314,15 @@ class WebPackageGeneratorTest extends TestCase
 
         $response = $this->get(route('acmetest_web_brand_pkg.web.home'));
         $response->assertStatus(200);
-        $response->assertSee('--brand-color: #E11D48;', false);
         $response->assertSee('Acme Enterprise Portal');
         $response->assertSee('src="/images/custom-logo.svg"', false);
+        $response->assertSee(route('acmetest_web_brand_pkg.web.branding.css'), false);
+        $response->assertDontSee('<style>', false);
+
+        $cssResponse = $this->get(route('acmetest_web_brand_pkg.web.branding.css'));
+        $cssResponse->assertStatus(200);
+        $cssResponse->assertHeader('Content-Type', 'text/css; charset=UTF-8');
+        $cssResponse->assertSee('--brand-color: #E11D48;', false);
     }
 
     public function test_overlapping_prefix_redirect_isolation_does_not_intercept_sub_admin_routes(): void

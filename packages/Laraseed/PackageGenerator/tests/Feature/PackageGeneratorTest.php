@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Laraseed;
+namespace Laraseed\PackageGenerator\Tests\Feature;
 
 use Illuminate\Filesystem\Filesystem;
 use Laraseed\PackageGenerator\Exceptions\PackageGenerationException;
@@ -9,7 +9,7 @@ use Laraseed\PackageGenerator\Support\PackageIdentity;
 use Laraseed\PackageGenerator\Support\PackageNameValidator;
 use Webkul\Core\Packages\OptionalPackageComposition;
 use Webkul\Core\Packages\OptionalPackageManifestLoader;
-use Tests\TestCase;
+use Laraseed\PackageGenerator\Tests\TestCase;
 
 class PackageGeneratorTest extends TestCase
 {

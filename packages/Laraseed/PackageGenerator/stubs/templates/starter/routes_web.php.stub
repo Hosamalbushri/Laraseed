@@ -6,6 +6,7 @@ use {{ NAMESPACE }}\Web\Http\Controllers\HomeController;
 use {{ NAMESPACE }}\Web\Http\Controllers\PageController;
 
 Route::name('{{ PACKAGE_KEY }}.web.')->group(function () {
+    Route::get('branding.css', [HomeController::class, 'brandingCss'])->name('branding.css');
     Route::get('/', [HomeController::class, 'index'])->name('home');
     Route::get('pages/{page?}', [PageController::class, 'show'])->name('pages.show');
 

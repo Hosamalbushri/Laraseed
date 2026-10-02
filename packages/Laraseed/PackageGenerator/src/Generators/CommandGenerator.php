@@ -19,6 +19,7 @@ class CommandGenerator
     ) {
         $this->basePath = $basePath ?? base_path();
         $this->resolver = new PackageResolver(basePath: $this->basePath);
+        $this->writer = new FilesystemWriter(basePath: $this->basePath);
     }
 
     /**

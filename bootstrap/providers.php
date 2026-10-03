@@ -2,7 +2,6 @@
 
 use App\Providers\AppServiceProvider;
 use Konekt\Concord\ConcordServiceProvider;
-use Laraseed\PackageGenerator\Providers\PackageGeneratorServiceProvider;
 use Prettus\Repository\Providers\RepositoryServiceProvider;
 use Webkul\Admin\Providers\AdminServiceProvider;
 use Webkul\Core\Providers\CoreServiceProvider;
@@ -34,6 +33,5 @@ return [
     InstallerServiceProvider::class,
     UserServiceProvider::class,
     DebugBarServiceProvider::class,
-    PackageGeneratorServiceProvider::class,
     ...$optionalProviders,
 ];

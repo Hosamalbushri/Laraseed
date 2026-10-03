@@ -28,7 +28,7 @@
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.14",
         "fakerphp/faker": "^1.23",
-        "laraseed/package-generator": "@dev",
+        "laraseed/package-generator": "dev-main",
         "laravel/pint": "^1.18",
         "laravel/sail": "^1.38",
         "mockery/mockery": "^1.6",
@@ -64,18 +64,19 @@
             "Webkul\\DataGrid\\": "packages/Webkul/DataGrid/src",
             "Webkul\\Installer\\": "packages/Webkul/Installer/src",
             "Webkul\\User\\": "packages/Webkul/User/src",
-            "Webkul\\DebugBar\\": "packages/Webkul/DebugBar/src",
-            "Laraseed\\Contacts\\": "packages/Laraseed/Contacts/src"
+            "Webkul\\DebugBar\\": "packages/Webkul/DebugBar/src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Laraseed\\PackageGenerator\\": "packages/Laraseed/PackageGenerator/src",
-            "Laraseed\\PackageGenerator\\Tests\\": "packages/Laraseed/PackageGenerator/tests/",
             "Tests\\": "tests/"
         }
     },
     "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/Hosamalbushri/laraseed-package-generator.git"
+        },
         {
             "type": "path",
             "url": "packages/*/*",
